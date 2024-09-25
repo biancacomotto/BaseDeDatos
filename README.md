@@ -1,4 +1,4 @@
-# Base de Datos y Recursos de Información – 2023
+# Base de Datos y Recursos de Información
 ## TP - MovieWeb
 
 ### Instalar dependencias
