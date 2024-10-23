@@ -11,7 +11,7 @@ app.use(express.static('views'));
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
 
-const db = new sqlite3.Database('\\Users\\rocio/faculty/segundo /anaydis/algoritmos-rbingas/BaseDeDatos/package.json');
+const db = new Database('./movies.db');
 
 
 // Configurar el motor de plantillas EJS
