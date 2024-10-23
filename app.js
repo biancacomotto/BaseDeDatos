@@ -1,10 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
 const ejs = require('ejs');
-// holAAAAA
-// pili
-// hola
-// chau
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -13,7 +10,9 @@ app.use(express.static('views'));
 
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
-const db = new sqlite3.Database('C:\\Users\\rocio\\devel\\BaseDeDatos\\BaseDatos2024');
+
+const db = new sqlite3.Database('\\Users\\rocio/faculty/segundo /anaydis/algoritmos-rbingas/BaseDeDatos/package.json');
+
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
@@ -23,23 +22,70 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Ruta para buscar películas
+// Ruta para buscar películas, directores y actores
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
 
-    // Realizar la búsqueda en la base de datos
-    db.all(
-        'SELECT * FROM movie WHERE title LIKE ?',
-        [`%${searchTerm}%`],
-        (err, rows) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('Error en la búsqueda.');
-            } else {
-                res.render('resultado', { movies: rows });
-            }
+    // Creamos objetos para guardar los resultados de cada consulta, por categoria (correspondiente)
+    const resultados = {
+        searchTerm,
+        movies: [],
+        actors: [],
+        directors: [],
+    };
+
+    // Consulta primero de peliculas
+    const consultaMovies = `
+        SELECT DISTINCT *
+        FROM movie
+        WHERE title LIKE ?
+        ORDER BY title ASC;
+    `;
+
+    // Consulta de actores
+    const consultaActores = `
+        SELECT DISTINCT person_name, p.person_id
+        FROM person p
+        JOIN movie_cast mc ON p.person_id = mc.person_id
+        WHERE person_name LIKE ?
+        ORDER BY person_name ASC;
+    `;
+
+    // Consulta de directores
+    const consultaDirectores = `
+        SELECT DISTINCT person_name, p.person_id
+        FROM person p
+        JOIN movie_crew mc ON p.person_id = mc.person_id
+        WHERE person_name LIKE ?
+        AND mc.job = 'Director'
+        ORDER BY person_name ASC;
+    `;
+
+    // Se busca en la base de datos
+    // Ejecutar la consulta de películas
+    db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
+        if (!err) {
+            resultados.movies = movieRows;
         }
-    );
+
+        // Ejecutar la consulta de actores
+        db.all(consultaActores, [`%${searchTerm}%`], (err, actorRows) => {
+            if (!err) {
+                resultados.actors = actorRows;
+            }
+
+            // Ejecutar la consulta de directores
+            db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
+                if (!err) {
+                    resultados.directors = directorRows;
+                }
+
+                // Renderizar la página de resultados y pasar el objeto que creamos antes, resultados
+                res.render('resultado', { resultados, searchTerm });
+
+            });
+        });
+    });
 });
 
 // Ruta para la página de datos de una película particular
