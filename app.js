@@ -6,6 +6,7 @@ const ejs = require('ejs');
 // hola
 // chau
 //catalocaaaaaa
+// soy rochi
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -14,12 +15,9 @@ app.use(express.static('views'));
 
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
-//const db = new sqlite3.Database('C:\\Users\\rocio\\devel\\BaseDeDatos\\BaseDatos2024');
-// Cargar las variables de entorno desde el archivo .env
-require('dotenv').config();
 
-// Usar la variable de entorno para la ruta de la base de datos
-const db = new sqlite3.Database(process.env.DB_PATH);
+const db = new sqlite3.Database('\\Users\\rocio/faculty/segundo /anaydis/algoritmos-rbingas/BaseDeDatos/package.json');
+
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
