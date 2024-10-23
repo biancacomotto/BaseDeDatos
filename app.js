@@ -1,7 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
 const ejs = require('ejs');
-
+// holAAAAA
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -10,7 +10,7 @@ app.use(express.static('views'));
 
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
-const db = new sqlite3.Database('C:\\Users\\datagrip\\movies.db');
+const db = new sqlite3.Database('C:\\Users\\rocio\\devel\\BaseDeDatos\\BaseDatos2024');
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
