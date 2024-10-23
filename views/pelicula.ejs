@@ -44,10 +44,15 @@
  <!-- Palabras clave (Keywords) -->
 <h3>Palabras Clave:</h3>
 <ul>
-    <% movie.keywords.forEach((keyword) => { %>
-        <li><%= keyword %></li>
-    <% }); %>
+    <% if (Array.isArray(movie.keywords) && movie.keywords.length > 0) { %>
+        <% movie.keywords.forEach((keyword) => { %>
+            <li><%= keyword %></li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay palabras clave disponibles.</li>
+    <% } %>
 </ul>
+
 <!--
 ul crea una unordered list y forEach permite recorrer todos los elementos de un array,
 (array movie.palabras_clave). Por cada "palabra clave", se ejecuta una función que genera un nuevo elemento li (elemento de lista).
@@ -55,48 +60,69 @@ Cada palabra clave se mostrará como un ítem dentro de la lista.
 -->
 
  <!-- Idiomas -->
- <h3>Idiomas:</h3>
- <ul>
-     <% movie.languages.forEach((language) => { %>
-             <li><%= language %></li>
-         <% }); %>
- </ul>
+<h3>Idiomas:</h3>
+<ul>
+    <% if (Array.isArray(movie.languages) && movie.languages.length > 0) { %>
+        <% movie.languages.forEach((language) => { %>
+            <li><%= language %></li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay idiomas disponibles.</li>
+    <% } %>
+</ul>
+
 
  <!-- Géneros -->
- <h3>Géneros:</h3>
- <ul>
-     <% movie.genres.forEach((genre) => { %>
-             <li><%= genre %></li>
-         <% }); %>
- </ul>
+<h3>Géneros:</h3>
+<ul>
+    <% if (Array.isArray(movie.genres) && movie.genres.length > 0) { %>
+        <% movie.genres.forEach((genre) => { %>
+            <li><%= genre %></li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay géneros disponibles.</li>
+    <% } %>
+</ul>
 
- <!-- Países de producción -->
- <h3>Países de Producción:</h3>
- <ul>
-     <%
-     const paisesUnicos = new Set();
-     movie.companies.forEach((company) => {
-         paisesUnicos.add(company.country_name);
-     });
 
-     Array.from(paisesUnicos).forEach((country) => { %>
-         <li><%= country %></li>
-     <% }); %>
-     <!--
-     - new Set(): Crea un conjunto, que almacena valores únicos, elimina duplicados.
-     - movie.companies.forEach: Itera sobre cada compañía en la lista movie.companies y agrega el nombre del país al Set (paisesUnicos).
-     - Array.from(paisesUnicos): Convierte el conjunto en un arreglo.
-     - forEach: Itera sobre el array y crea un elemento de lista (li) para mostrar el nombre de cada país.
-     -->
- </ul>
+<!-- Países de producción -->
+<h3>Países de Producción:</h3>
+<ul>
+    <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
+        <%
+            const paisesUnicos = new Set();
+            movie.companies.forEach((company) => {
+                paisesUnicos.add(company.country_name);
+            });
+
+        Array.from(paisesUnicos).forEach((country) => { %>
+            <li><%= country %></li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay países de producción disponibles.</li>
+    <% } %>
+</ul>
+
+<!--
+- new Set(): Crea un conjunto, que almacena valores únicos, elimina duplicados.
+- movie.companies.forEach: Itera sobre cada compañía en la lista movie.companies y agrega el nombre del país al Set (paisesUnicos).
+- Array.from(paisesUnicos): Convierte el conjunto en un arreglo.
+- forEach: Itera sobre el array y crea un elemento de lista (li) para mostrar el nombre de cada país.
+-->
+
 
  <!-- Empresas de producción -->
- <h3>Empresas de Producción:</h3>
- <ul>
-     <% movie.companies.forEach((company) => { %>
-         <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
-     <% }); %>
- </ul>
+<h3>Empresas de Producción:</h3>
+<ul>
+    <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
+        <% movie.companies.forEach((company) => { %>
+            <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay empresas de producción disponibles.</li>
+    <% } %>
+</ul>
+
 
 <p></p>
 <!-- Botón para volver al buscador -->
