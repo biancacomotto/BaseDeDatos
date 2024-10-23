@@ -13,7 +13,12 @@ app.use(express.static('views'));
 
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
-const db = new sqlite3.Database('C:\\Users\\rocio\\devel\\BaseDeDatos\\BaseDatos2024');
+//const db = new sqlite3.Database('C:\\Users\\rocio\\devel\\BaseDeDatos\\BaseDatos2024');
+// Cargar las variables de entorno desde el archivo .env
+require('dotenv').config();
+
+// Usar la variable de entorno para la ruta de la base de datos
+const db = new sqlite3.Database(process.env.DB_PATH);
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
