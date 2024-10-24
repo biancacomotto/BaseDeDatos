@@ -83,7 +83,7 @@ app.get('/buscar', (req, res) => {
     });
 });
 
-// ----- INICIO: Rutas para el Buscador de Palabras Clave -----
+// Buscador de Keywords
 
 // Ruta para mostrar la página de búsqueda
 app.get('/search_keyword', (req, res) => {
@@ -115,9 +115,6 @@ app.get('/resultados_keyword', (req, res) => {
     });
 });
 
-// ----- FIN: Rutas para el Buscador de Palabras Clave -----
-
-// Rutas para datos de películas, actores y directores (ya existentes en tu código)
 
 // Ruta para la página de datos de una película particular
 app.get('/pelicula/:id', (req, res) => {
