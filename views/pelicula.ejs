@@ -75,32 +75,29 @@ Cada palabra clave se mostrará como un ítem dentro de la lista.
  <!-- Géneros -->
 <h3>Géneros:</h3>
 <ul>
-    <% if (Array.isArray(movie.genres) && movie.genres.length > 0) { %>
-        <% movie.genres.forEach((genre) => { %>
-            <li><%= genre %></li>
-        <% }); %>
-    <% } else { %>
-        <li>No hay géneros disponibles.</li>
-    <% } %>
+    <% movie.genres.forEach((genre) => { %>
+        <li><%= genre %></li>
+    <% }); %>
 </ul>
 
-
-<!-- Países de producción -->
-<h3>Países de Producción:</h3>
+<h3>Paises de Produccion:</h3>
 <ul>
-    <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
-        <%
-            const paisesUnicos = new Set();
-            movie.companies.forEach((company) => {
-                paisesUnicos.add(company.country_name);
-            });
+    <%
+    const uniqueCountries = new Set();
+    movie.companies.forEach((company) => {
+        uniqueCountries.add(company.country_name);
+    });
 
-        Array.from(paisesUnicos).forEach((country) => { %>
-            <li><%= country %></li>
-        <% }); %>
-    <% } else { %>
-        <li>No hay países de producción disponibles.</li>
-    <% } %>
+    Array.from(uniqueCountries).forEach((country) => { %>
+        <li><%= country %></li>
+    <% }); %>
+</ul>
+<!-- Muestro las empresas de producción con sus paises -->
+<h3>Empresas de Producción:</h3>
+<ul>
+    <% movie.companies.forEach((company) => { %>
+        <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
+    <% }); %>
 </ul>
 
 <!--
@@ -112,16 +109,6 @@ Cada palabra clave se mostrará como un ítem dentro de la lista.
 
 
  <!-- Empresas de producción -->
-<h3>Empresas de Producción:</h3>
-<ul>
-    <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
-        <% movie.companies.forEach((company) => { %>
-            <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
-        <% }); %>
-    <% } else { %>
-        <li>No hay empresas de producción disponibles.</li>
-    <% } %>
-</ul>
 
 
 <p></p>
