@@ -11,7 +11,7 @@ app.use(express.static('views'));
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
 
-const db = new sqlite3.Database('/Users/bian/Downloads/movies-7.db');
+const db = new sqlite3.Database('C:\\Users\\milig\\Downloads\\sqlite\\movies.db');
 
 
 // Configurar el motor de plantillas EJS
@@ -103,23 +103,13 @@ app.get('/pelicula/:id', (req, res) => {
       movie_cast.character_name,
       movie_cast.cast_order,
       department.department_name,
-      movie_crew.job,
-      movie_keywords.keyword,                   -- Agregar keywords
-      movie_languages.language,                 -- Agregar idiomas
-      movie_genres.genre,                       -- Agregar géneros
-      production_company.company_name,          -- Agregar empresas de producción
-      production_company.country_name           -- Agregar países de producción
-    
+      movie_crew.job
     FROM movie
     LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
     LEFT JOIN person as actor ON movie_cast.person_id = actor.person_id
     LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
     LEFT JOIN department ON movie_crew.department_id = department.department_id
     LEFT JOIN person as crew_member ON crew_member.person_id = movie_crew.person_id
-    LEFT JOIN movie_keywords ON movie.movie_id = movie_keywords.movie_id        -- Unir tabla de palabras clave
-    LEFT JOIN movie_languages ON movie.movie_id = movie_languages.movie_id      -- Unir tabla de idiomas
-    LEFT JOIN movie_genres ON movie.movie_id = movie_genres.movie_id            -- Unir tabla de géneros
-    LEFT JOIN production_company ON movie.movie_id = production_company.movie_id -- Unir tabla de compañías
     WHERE movie.movie_id = ?
   `;
 
@@ -246,7 +236,6 @@ app.get('/actor/:id', (req, res) => {
     SELECT DISTINCT
       person.person_name as actorName,
       movie.*
-    
     FROM movie
     INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
     INNER JOIN person ON person.person_id = movie_cast.person_id
