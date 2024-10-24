@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 app.use(express.static('views'));
 
 // Configuración de la base de datos
-const db = new sqlite3.Database('./movies.db');
+const db = new sqlite3.Database('./movies.db'); //path
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
