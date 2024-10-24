@@ -8,12 +8,12 @@ const port = process.env.PORT || 3000;
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
-//
+
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
 
 //const db = new sqlite3.Database('C:\\Users\\milig\\Downloads\\sqlite\\movies.db');
-const db = new Database('./movies.db');
+const db = new sqlite3.Database('./movies.db');
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
