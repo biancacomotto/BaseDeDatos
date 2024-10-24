@@ -1,0 +1,17 @@
+<!-- views/search_keyword.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar Películas por Palabra Clave</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Buscar Películas por Palabra Clave</h1>
+<form action="/resultados_keyword" method="GET">
+    <label for="keyword">Palabra Clave:</label>
+    <input type="text" id="keyword" name="keyword" required>
+    <button type="submit">Buscar</button>
+</form>
+</body>
+</html>
