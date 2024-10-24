@@ -39,9 +39,9 @@
             (<%= crewMember.job %>)
         </li>
     <% }); %>
- </ul>
+</ul>
 
- <!-- Palabras clave (Keywords) -->
+<!-- Palabras clave (Keywords) -->
 <h3>Palabras Clave:</h3>
 <ul>
     <% if (Array.isArray(movie.keywords) && movie.keywords.length > 0) { %>
@@ -59,7 +59,7 @@ ul crea una unordered list y forEach permite recorrer todos los elementos de un 
 Cada palabra clave se mostrará como un ítem dentro de la lista.
 -->
 
- <!-- Idiomas -->
+<!-- Idiomas -->
 <h3>Idiomas:</h3>
 <ul>
     <% if (Array.isArray(movie.languages) && movie.languages.length > 0) { %>
@@ -72,32 +72,35 @@ Cada palabra clave se mostrará como un ítem dentro de la lista.
 </ul>
 
 
- <!-- Géneros -->
+<!-- Géneros -->
 <h3>Géneros:</h3>
 <ul>
-    <% movie.genres.forEach((genre) => { %>
-        <li><%= genre %></li>
-    <% }); %>
+    <% if (Array.isArray(movie.genres) && movie.genres.length > 0) { %>
+        <% movie.genres.forEach((genre) => { %>
+            <li><%= genre %></li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay géneros disponibles.</li>
+    <% } %>
 </ul>
 
-<h3>Paises de Produccion:</h3>
-<ul>
-    <%
-    const uniqueCountries = new Set();
-    movie.companies.forEach((company) => {
-        uniqueCountries.add(company.country_name);
-    });
 
-    Array.from(uniqueCountries).forEach((country) => { %>
-        <li><%= country %></li>
-    <% }); %>
-</ul>
-<!-- Muestro las empresas de producción con sus paises -->
-<h3>Empresas de Producción:</h3>
+<!-- Países de producción -->
+<h3>Países de Producción:</h3>
 <ul>
-    <% movie.companies.forEach((company) => { %>
-        <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
-    <% }); %>
+    <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
+        <%
+            const paisesUnicos = new Set();
+            movie.companies.forEach((company) => {
+                paisesUnicos.add(company.country_name);
+            });
+
+        Array.from(paisesUnicos).forEach((country) => { %>
+            <li><%= country %></li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay países de producción disponibles.</li>
+    <% } %>
 </ul>
 
 <!--
@@ -108,11 +111,21 @@ Cada palabra clave se mostrará como un ítem dentro de la lista.
 -->
 
 
- <!-- Empresas de producción -->
+<!-- Empresas de producción -->
+<h3>Empresas de Producción:</h3>
+<ul>
+    <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
+        <% movie.companies.forEach((company) => { %>
+            <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
+        <% }); %>
+    <% } else { %>
+        <li>No hay empresas de producción disponibles.</li>
+    <% } %>
+</ul>
 
 
 <p></p>
 <!-- Botón para volver al buscador -->
 <div id="inicio"><a href="/">Inicio</a></div>
 </body>
-</html>
+</html></html>
