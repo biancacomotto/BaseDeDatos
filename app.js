@@ -8,7 +8,7 @@ const port = process.env.PORT || 3000;
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
-
+//
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
 
