@@ -5,7 +5,7 @@ const {Database} = require("sqlite3");
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+// hola soy rocgi
 // Serve static files from the "views" directory
 app.use(express.static('views'));
 
