@@ -5,6 +5,9 @@ const {Database} = require("sqlite3");
 
 const app = express();
 const port = process.env.PORT || 3000;
+//const db = new sqlite3.Database('./movies.db'); //path
+
+//cataaaaaa
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
@@ -470,10 +473,10 @@ app.delete('/users/:id', (req, res) => {
 //const sqlite3 = require('sqlite3').verbose();
 //const db = new sqlite3.Database('./movies.db', (err) => {
 
-        // Crear tablas si no existen
-        db.serialize(() => {
-            // Crear tabla users
-            db.run(`
+// Crear tablas si no existen
+db.serialize(() => {
+    // Crear tabla users
+    db.run(`
                 CREATE TABLE IF NOT EXISTS users (
                     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_username TEXT NOT NULL UNIQUE,
@@ -481,13 +484,13 @@ app.delete('/users/:id', (req, res) => {
                     user_email TEXT NOT NULL UNIQUE
                 )
             `, (err) => {
-                if (err) {
-                    console.error("Error al crear la tabla users:", err.message);
-                }
-            });
+        if (err) {
+            console.error("Error al crear la tabla users:", err.message);
+        }
+    });
 
-            // Crear tabla movie_user
-            db.run(`
+    // Crear tabla movie_user
+    db.run(`
                 CREATE TABLE IF NOT EXISTS movie_user (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
@@ -498,11 +501,11 @@ app.delete('/users/:id', (req, res) => {
                     FOREIGN KEY (movie_id) REFERENCES movie(movie_id)
                 )
             `, (err) => {
-                if (err) {
-                    console.error("Error al crear la tabla movie_user:", err.message);
-                }
-            });
-        });
+        if (err) {
+            console.error("Error al crear la tabla movie_user:", err.message);
+        }
+    });
+});
 
 
 
@@ -513,8 +516,8 @@ app.get('/users', (req, res) => {
         SELECT u.user_id, u.user_username, u.user_name, u.user_email,
                m.title AS movie_title, mu.rating, mu.opinion
         FROM users u
-        LEFT JOIN movie_user mu ON u.user_id = mu.user_id
-        LEFT JOIN movie m ON mu.movie_id = m.movie_id
+                 LEFT JOIN movie_user mu ON u.user_id = mu.user_id
+                 LEFT JOIN movie m ON mu.movie_id = m.movie_id
         ORDER BY u.user_id;
     `;
     db.all(query, (err, rows) => {
@@ -547,7 +550,9 @@ app.get('/users', (req, res) => {
 });
 
 
-// Asociar una película a un usuario con puntuación y opinión
+
+
+/// Asociar una película a un usuario con puntuación y opinión
 app.post('/users/:id/movies', (req, res) => {
     const { id } = req.params;
     const { movie_id, rating, opinion } = req.body;
@@ -564,9 +569,10 @@ app.post('/users/:id/movies', (req, res) => {
     });
 });
 
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 
 // Ruta para mostrar el formulario de registro
 app.get('/register', (req, res) => {
@@ -593,9 +599,12 @@ app.post('/register', (req, res) => {
     });
 });
 
+
 //--------------------------
 
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor en ejecución en http://localhost:${port}`);
 });
+
+
