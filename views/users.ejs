@@ -8,6 +8,10 @@
 </head>
 <body>
 <h1>Usuarios y Películas Favoritas</h1>
+
+<!-- Botón para regresar a la página principal -->
+<button onclick="window.location.href='/'">Regresar a la Página Principal</button>
+
 <div id="usuarios">
     <% if (users && users.length > 0) { %>
         <% users.forEach(user => { %>
@@ -21,8 +25,8 @@
                         <% user.movies.forEach(movie => { %>
                             <li>
                                 <strong>Título:</strong> <%= movie.title %> <br>
-                                <strong>Puntuación:</strong> <%= movie.rating %> <br>
-                                <strong>Opinión:</strong> <%= movie.opinion %>
+                                <strong>Puntuación:</strong> <%= movie.rating ? movie.rating : 'No calificado' %> <br>
+                                <strong>Opinión:</strong> <%= movie.opinion ? movie.opinion : 'Sin opinión' %>
                             </li>
                         <% }) %>
                     </ul>
@@ -30,6 +34,7 @@
                     <p>Este usuario no tiene películas favoritas registradas.</p>
                 <% } %>
             </div>
+            <hr> <!-- Línea horizontal para separar usuarios -->
         <% }) %>
     <% } else { %>
         <p>No hay usuarios registrados.</p>

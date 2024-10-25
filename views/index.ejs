@@ -70,6 +70,17 @@
             font-size: 18px;
             text-decoration: underline;
         }
+
+        .list-users-button {
+            margin: 20px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +88,12 @@
 
 <!-- Contenido principal -->
 <h1>MovieWeb🎬</h1>
+
+<!-- Botón para listar usuarios -->
+<button onclick="window.location.href='/users'" class="list-users-button">
+    Listar Usuarios
+</button>
+
 <form action="/buscar" method="GET">
     <input type="text" name="q" placeholder="Buscar películas, actores y directores..." required />
     <select name="tipoBusqueda">
@@ -207,5 +224,6 @@
     window.addEventListener("mousemove", mousemove);
     window.addEventListener("mouseout", mouseout);
 </script>
+
 </body>
 </html>
