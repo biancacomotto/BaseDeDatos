@@ -31,6 +31,10 @@
             font-size: 36px;
             color: #ffffff; /* Cambia el color si es necesario para mejor contraste */
             margin-bottom: 20px;
+            margin-right: 100px;
+            background-color: rgba(0, 0, 0, 0.5); /* Añadir un color de fondo (opcional) */
+            padding: 10px 20px; /* Añadir espacio interno */
+            border-radius: 30px; /* Aquí se añaden bordes redondeados */
         }
 
         form {
@@ -67,9 +71,20 @@
 <!-- Contenido principal -->
 <h1>MovieWeb🎬</h1>
 <form action="/buscar" method="GET">
-    <input type="text" name="q" placeholder="Buscar películas, actores y directores..." />
+    <!-- Campo para la búsqueda -->
+    <input type="text" name="q" placeholder="Buscar películas, actores y directores..." required />
+
+    <!-- Menú desplegable para seleccionar tipo de búsqueda -->
+    <select name="tipoBusqueda">
+        <option value="movie">Película</option>
+        <option value="actor">Actor</option>
+        <option value="director">Director</option>
+    </select>
+
+    <!-- Botón de búsqueda -->
     <button type="submit">Buscar</button>
 </form>
+
 
 <script>
     // Código de partículas animadas
