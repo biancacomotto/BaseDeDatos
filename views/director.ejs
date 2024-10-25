@@ -7,7 +7,7 @@
 <body>
 <h1>Películas dirigidas por <%= directorName %></h1>
 <ul>
-    <% movies.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>
+    <% moviesDirected.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>
         <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %> (<%= new Date(movie.release_date).getFullYear() %>)</a></li>
     <% }); %>
 </ul>

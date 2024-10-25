@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuarios y Películas</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Archivo CSS opcional para el estilo -->
+</head>
+<body>
+<h1>Usuarios y Películas Favoritas</h1>
+
+<!-- Botón para regresar a la página principal -->
+<button onclick="window.location.href='/'">Regresar a la Página Principal</button>
+
+<div id="usuarios">
+    <% if (users && users.length > 0) { %>
+        <% users.forEach(user => { %>
+            <div class="usuario">
+                <h2><%= user.user_name %> (<%= user.user_username %>)</h2>
+                <p>Email: <%= user.user_email %></p>
+
+                <% if (user.movies && user.movies.length > 0) { %>
+                    <h3>Películas que le gustan:</h3>
+                    <ul>
+                        <% user.movies.forEach(movie => { %>
+                            <li>
+                                <strong>Título:</strong> <%= movie.title %> <br>
+                                <strong>Puntuación:</strong> <%= movie.rating ? movie.rating : 'No calificado' %> <br>
+                                <strong>Opinión:</strong> <%= movie.opinion ? movie.opinion : 'Sin opinión' %>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p>Este usuario no tiene películas favoritas registradas.</p>
+                <% } %>
+            </div>
+            <hr> <!-- Línea horizontal para separar usuarios -->
+        <% }) %>
+    <% } else { %>
+        <p>No hay usuarios registrados.</p>
+    <% } %>
+</div>
+</body>
+</html>
