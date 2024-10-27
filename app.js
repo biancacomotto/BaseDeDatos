@@ -22,7 +22,8 @@ app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
     res.render('index');
 });
-// ruta buscar
+
+// Ruta para buscar películas, directores y actores
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
     const tipoBusqueda = req.query.tipoBusqueda;  // Capturar el tipo de búsqueda del formulario
