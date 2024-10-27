@@ -68,3 +68,112 @@ a:hover {
     margin: 0 auto; /* Centrar horizontalmente el elemento */
     padding: 50px; /* Agregar un poco de espacio interior para que se vea mejor */
 }
+
+/* Estilo para los recuadros */
+.info-box {
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    display: inline-block;
+    width: 250px;
+    vertical-align: top;
+}
+
+/* Estilo para los íconos (puedes usar FontAwesome o una imagen) */
+.info-box-icon {
+    font-size: 40px;
+    color: #ff9900;
+    margin-bottom: 10px;
+}
+
+/* Texto del título dentro del recuadro */
+.info-box-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Estilo para el texto dentro del recuadro */
+.info-box-content {
+    font-size: 14px;
+}
+/* Estilo para el contenedor de los idiomas */
+.info-box {
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    display: inline-block;
+    width: 300px; /* Ajusta el ancho si es necesario */
+    vertical-align: top;
+}
+
+/* Contenedor de banderas */
+.flag-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+/* Estilo para los círculos de las banderas */
+.flag-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilo para las imágenes de las banderas */
+.flag-circle img {
+    width: 130%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Texto del título dentro del recuadro */
+.info-box-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Estilo para el texto dentro del recuadro */
+.info-box-content {
+    font-size: 14px;
+}
+/* Estilo para el recuadro del argumento */
+.info-box-argument {
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 60px; /* Mayor espacio debajo del recuadro del argumento */
+    text-align: justify;
+    width: 85%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Espacio adicional para el recuadro de Elenco */
+.info-box-elenco {
+    margin-top: 60px; /* Agrega espacio superior para evitar que choque con el Argumento */
+}
+
+/* Espaciado adicional entre todas las secciones */
+.info-box {
+    margin-bottom: 50px; /* Espaciado consistente debajo de cada sección */
+}
+
+/* Mantener el padding dentro del texto */
+.info-box-content p {
+    padding: 10px 20px;
+}

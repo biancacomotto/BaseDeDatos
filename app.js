@@ -5,6 +5,9 @@ const {Database} = require("sqlite3");
 
 const app = express();
 const port = process.env.PORT || 3000;
+//const db = new sqlite3.Database('./movies.db'); //path
+
+//holaaa roco
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
@@ -23,66 +26,50 @@ app.get('/', (req, res) => {
 // Ruta para buscar películas, directores y actores
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
+    const tipoBusqueda = req.query.tipoBusqueda;  // Capturar el tipo de búsqueda del formulario
 
     const resultados = {
         searchTerm,
         movies: [],
         actors: [],
         directors: [],
+        keywords: []
     };
 
-    // Consulta de películas
-    const consultaMovies = `
-        SELECT DISTINCT *
-        FROM movie
-        WHERE title LIKE ?
-        ORDER BY title ASC;
-    `;
+    if (tipoBusqueda === 'movie') {
+        // Consulta de películas
+        const consultaMovies = `SELECT DISTINCT * FROM movie WHERE title LIKE ? ORDER BY title ASC;`;
+        db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
+            if (!err) {
+                resultados.movies = movieRows;
+            }
+            res.render('resultado', { resultados, tipoBusqueda });
+        });
 
-    // Consulta de actores
-    const consultaActores = `
-        SELECT DISTINCT person_name, p.person_id
-        FROM person p
-        JOIN movie_cast mc ON p.person_id = mc.person_id
-        WHERE person_name LIKE ?
-        ORDER BY person_name ASC;
-    `;
-
-    // Consulta de directores
-    const consultaDirectores = `
-        SELECT DISTINCT person_name, p.person_id
-        FROM person p
-        JOIN movie_crew mc ON p.person_id = mc.person_id
-        WHERE person_name LIKE ?
-        AND mc.job = 'Director'
-        ORDER BY person_name ASC;
-    `;
-
-
-    // Ejecutar la consulta de películas
-    db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
-        if (!err) {
-            resultados.movies = movieRows;
-        }
-
-        // Ejecutar la consulta de actores
+    } else if (tipoBusqueda === 'actor') {
+        // Consulta de actores
+        const consultaActores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_cast mc ON p.person_id = mc.person_id WHERE person_name LIKE ? ORDER BY person_name ASC;`;
         db.all(consultaActores, [`%${searchTerm}%`], (err, actorRows) => {
             if (!err) {
                 resultados.actors = actorRows;
             }
-
-            // Ejecutar la consulta de directores
-            db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
-                if (!err) {
-                    resultados.directors = directorRows;
-                }
-
-                // Renderizar la página de resultados
-                res.render('resultado', { resultados, searchTerm });
-            });
+            res.render('resultado', { resultados, tipoBusqueda });
         });
-    });
+
+    } else if (tipoBusqueda === 'director') {
+        // Consulta de directores
+        const consultaDirectores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_crew mc ON p.person_id = mc.person_id WHERE person_name LIKE ? AND mc.job = 'Director' ORDER BY person_name ASC;`;
+        db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
+            if (!err) {
+                resultados.directors = directorRows;
+            }
+            res.render('resultado', { resultados, tipoBusqueda });
+        });
+    } else {
+        res.render('resultado', { resultados, tipoBusqueda });
+    }
 });
+
 
 // ----- INICIO: Rutas para el Buscador de Palabras Clave -----
 
@@ -366,6 +353,7 @@ app.get('/actor/:id', (req, res) => {
     });
 });
 
+
 // Ruta para los datos de un director específico
 app.get('/director/:id', (req, res) => {
     const personId = req.params.id;
@@ -410,9 +398,198 @@ app.get('/director/:id', (req, res) => {
     });
 });
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
+// Crear un nuevo usuario
+app.post('/users', (req, res) => {
+    const { user_username, user_name, user_email } = req.body;
+    const query = `
+        INSERT INTO users (user_username, user_name, user_email)
+        VALUES (?, ?, ?);
+    `;
+    db.run(query, [user_username, user_name, user_email], function (err) {
+        if (err) {
+            res.status(500).send("Error al crear el usuario.");
+        } else {
+            res.status(201).send({ user_id: this.lastID });
+        }
+    });
+});
+
+// Modificar un usuario existente
+app.put('/users/:id', (req, res) => {
+    const { id } = req.params;
+    const { user_username, user_name, user_email } = req.body;
+    const query = `
+        UPDATE users
+        SET user_username = ?, user_name = ?, user_email = ?
+        WHERE user_id = ?;
+    `;
+    db.run(query, [user_username, user_name, user_email, id], function (err) {
+        if (err) {
+            res.status(500).send("Error al actualizar el usuario.");
+        } else {
+            res.send("Usuario actualizado correctamente.");
+        }
+    });
+});
+
+// Eliminar un usuario
+app.delete('/users/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `
+        DELETE FROM users WHERE user_id = ?;
+    `;
+    db.run(query, [id], function (err) {
+        if (err) {
+            res.status(500).send("Error al eliminar el usuario.");
+        } else {
+            res.send("Usuario eliminado correctamente.");
+        }
+    });
+});
+// PUNTO 6 ////////----------
+// creo tablas
+//Tabla de Usuarios
+// Configuración de la base de datos
+//const sqlite3 = require('sqlite3').verbose();
+//const db = new sqlite3.Database('./movies.db', (err) => {
+
+// Crear tablas si no existen
+db.serialize(() => {
+    // Crear tabla users
+    db.run(`
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_username TEXT NOT NULL UNIQUE,
+                    user_name TEXT NOT NULL,
+                    user_email TEXT NOT NULL UNIQUE
+                )
+            `, (err) => {
+        if (err) {
+            console.error("Error al crear la tabla users:", err.message);
+        }
+    });
+
+    // Crear tabla movie_user
+    db.run(`
+                CREATE TABLE IF NOT EXISTS movie_user (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    movie_id INTEGER NOT NULL,
+                    rating INTEGER CHECK(rating BETWEEN 1 AND 5),
+                    opinion TEXT,
+                    FOREIGN KEY (user_id) REFERENCES users(user_id),
+                    FOREIGN KEY (movie_id) REFERENCES movie(movie_id)
+                )
+            `, (err) => {
+        if (err) {
+            console.error("Error al crear la tabla movie_user:", err.message);
+        }
+    });
+});
+
+
+
+
+// Listar todos los usuarios y sus películas con puntuación y opinión
+app.get('/users', (req, res) => {
+    const query = `
+        SELECT u.user_id, u.user_username, u.user_name, u.user_email,
+               m.title AS movie_title, mu.rating, mu.opinion
+        FROM users u
+                 LEFT JOIN movie_user mu ON u.user_id = mu.user_id
+                 LEFT JOIN movie m ON mu.movie_id = m.movie_id
+        ORDER BY u.user_id;
+    `;
+    db.all(query, (err, rows) => {
+        if (err) {
+            res.status(500).send("Error al listar los usuarios.");
+        } else {
+            // Estructura los datos en un formato adecuado
+            const users = rows.reduce((acc, row) => {
+                const user = acc[row.user_id] || {
+                    user_id: row.user_id,
+                    user_username: row.user_username,
+                    user_name: row.user_name,
+                    user_email: row.user_email,
+                    movies: []
+                };
+                if (row.movie_title) {
+                    user.movies.push({
+                        title: row.movie_title,
+                        rating: row.rating,
+                        opinion: row.opinion
+                    });
+                }
+                acc[row.user_id] = user;
+                return acc;
+            }, {});
+            // Renderizar la vista users.ejs con los datos de usuarios
+            res.render('users', { users: Object.values(users) });
+        }
+    });
+});
+
+
+
+
+/// Asociar una película a un usuario con puntuación y opinión
+app.post('/users/:id/movies', (req, res) => {
+    const { id } = req.params;
+    const { movie_id, rating, opinion } = req.body;
+    const query = `
+        INSERT INTO movie_user (user_id, movie_id, rating, opinion)
+        VALUES (?, ?, ?, ?);
+    `;
+    db.run(query, [id, movie_id, rating, opinion], function (err) {
+        if (err) {
+            res.status(500).send("Error al asociar la película al usuario.");
+        } else {
+            res.status(201).send("Película asociada al usuario correctamente.");
+        }
+    });
+});
+
+//const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
+// Ruta para mostrar el formulario de registro
+app.get('/register', (req, res) => {
+    res.render('register', { message: null });
+});
+
+// Ruta para manejar el envío del formulario de registro
+app.post('/register', (req, res) => {
+    const { user_username, user_name, user_email } = req.body;
+
+    // SQL para insertar un nuevo usuario
+    const query = `
+        INSERT INTO users (user_username, user_name, user_email)
+        VALUES (?, ?, ?);
+    `;
+
+    db.run(query, [user_username, user_name, user_email], (err) => {
+        if (err) {
+            console.error("Error al registrar el usuario:", err.message);
+            res.render('register', { message: "Error al registrar el usuario. Inténtalo de nuevo." });
+        } else {
+            res.render('register', { message: "Usuario registrado con éxito." });
+        }
+    });
+});
+
+app.use(express.static('public'));
+
+//--------------------------
 
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor en ejecución en http://localhost:${port}`);
 });
+
+
