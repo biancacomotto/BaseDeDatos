@@ -22,70 +22,53 @@ app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
     res.render('index');
 });
-
-// Ruta para buscar películas, directores y actores
+// ruta buscar
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
+    const tipoBusqueda = req.query.tipoBusqueda;  // Capturar el tipo de búsqueda del formulario
 
     const resultados = {
         searchTerm,
         movies: [],
         actors: [],
         directors: [],
+        keywords: []
     };
 
-    // Consulta de películas
-    const consultaMovies = `
-        SELECT DISTINCT *
-        FROM movie
-        WHERE title LIKE ?
-        ORDER BY title ASC;
-    `;
+    if (tipoBusqueda === 'movie') {
+        // Consulta de películas
+        const consultaMovies = `SELECT DISTINCT * FROM movie WHERE title LIKE ? ORDER BY title ASC;`;
+        db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
+            if (!err) {
+                resultados.movies = movieRows;
+            }
+            res.render('resultado', { resultados, tipoBusqueda });
+        });
 
-    // Consulta de actores
-    const consultaActores = `
-        SELECT DISTINCT person_name, p.person_id
-        FROM person p
-        JOIN movie_cast mc ON p.person_id = mc.person_id
-        WHERE person_name LIKE ?
-        ORDER BY person_name ASC;
-    `;
-
-    // Consulta de directores
-    const consultaDirectores = `
-        SELECT DISTINCT person_name, p.person_id
-        FROM person p
-        JOIN movie_crew mc ON p.person_id = mc.person_id
-        WHERE person_name LIKE ?
-        AND mc.job = 'Director'
-        ORDER BY person_name ASC;
-    `;
-
-
-    // Ejecutar la consulta de películas
-    db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
-        if (!err) {
-            resultados.movies = movieRows;
-        }
-
-        // Ejecutar la consulta de actores
+    } else if (tipoBusqueda === 'actor') {
+        // Consulta de actores
+        const consultaActores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_cast mc ON p.person_id = mc.person_id WHERE person_name LIKE ? ORDER BY person_name ASC;`;
         db.all(consultaActores, [`%${searchTerm}%`], (err, actorRows) => {
             if (!err) {
                 resultados.actors = actorRows;
             }
-
-            // Ejecutar la consulta de directores
-            db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
-                if (!err) {
-                    resultados.directors = directorRows;
-                }
-
-                // Renderizar la página de resultados
-                res.render('resultado', { resultados, searchTerm });
-            });
+            res.render('resultado', { resultados, tipoBusqueda });
         });
-    });
+
+    } else if (tipoBusqueda === 'director') {
+        // Consulta de directores
+        const consultaDirectores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_crew mc ON p.person_id = mc.person_id WHERE person_name LIKE ? AND mc.job = 'Director' ORDER BY person_name ASC;`;
+        db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
+            if (!err) {
+                resultados.directors = directorRows;
+            }
+            res.render('resultado', { resultados, tipoBusqueda });
+        });
+    } else {
+        res.render('resultado', { resultados, tipoBusqueda });
+    }
 });
+
 
 // ----- INICIO: Rutas para el Buscador de Palabras Clave -----
 

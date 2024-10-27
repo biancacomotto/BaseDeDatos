@@ -1,175 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= movie.title %></title>
+    <title>Resultado de la Búsqueda</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<h1><%= movie.title %></h1>
-<h3>Fecha: <%= movie.release_date %></h3>
+<h1>Resultado de la Búsqueda</h1>
 
-<!-- Dirigida por -->
-<div class="info-box">
-    <div class="info-box-title">Dirigida por</div>
-    <div class="info-box-content">
+<!-- Sección de Películas (solo se muestra si el tipo de búsqueda es 'movie') -->
+<% if (tipoBusqueda === 'movie') { %>
+    <h2>Películas</h2>
+    <% if (resultados.movies.length === 0) { %>
+        <p>No se encontraron películas.</p>
+    <% } else { %>
         <ul>
-            <% movie.directors.forEach((director) => { %>
-                <li>
-                    <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
-                </li>
+            <% resultados.movies.forEach((movie) => { %>
+                <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></li>
             <% }); %>
         </ul>
-    </div>
-</div>
+    <% } %>
+<% } %>
 
-<!-- Escrita por -->
-<div class="info-box">
-    <div class="info-box-title">Escrita por</div>
-    <div class="info-box-content">
+<!-- Sección de Actores (solo se muestra si el tipo de búsqueda es 'actor') -->
+<% if (tipoBusqueda === 'actor') { %>
+    <h2>Actores</h2>
+    <% if (resultados.actors.length === 0) { %>
+        <p>No se encontraron actores.</p>
+    <% } else { %>
         <ul>
-            <% movie.writers.forEach((writer) => { %>
-                <li>
-                    <%= writer.crew_member_name %>
-                </li>
+            <% resultados.actors.forEach((actor) => { %>
+                <li><a href="/actor/<%= actor.person_id %>"><%= actor.person_name %></a></li>
             <% }); %>
         </ul>
-    </div>
-</div>
+    <% } %>
+<% } %>
 
-<!-- Argumento -->
-<div class="info-box-argument">
-    <div class="info-box-title">Argumento</div>
-    <div class="info-box-content">
-        <p><%= movie.overview %></p>
-    </div>
-</div>
-
-<!-- Elenco -->
-<div class="info-box info-box-elenco">
-    <div class="info-box-title">Elenco</div>
-    <div class="info-box-content">
+<!-- Sección de Directores (solo se muestra si el tipo de búsqueda es 'director') -->
+<% if (tipoBusqueda === 'director') { %>
+    <h2>Directores</h2>
+    <% if (resultados.directors.length === 0) { %>
+        <p>No se encontraron directores.</p>
+    <% } else { %>
         <ul>
-            <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
-                <li><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
+            <% resultados.directors.forEach((director) => { %>
+                <li><a href="/director/<%= director.person_id %>"><%= director.person_name %></a></li>
             <% }); %>
         </ul>
-    </div>
-</div>
+    <% } %>
+<% } %>
 
-<!-- Crew -->
-<div class="info-box">
-    <div class="info-box-title">Crew</div>
-    <div class="info-box-content">
-        <ul>
-            <% movie.crew.forEach((crewMember) => { %>
-                <li>
-                    <%= crewMember.crew_member_name %> - <%= crewMember.department_name %> (<%= crewMember.job %>)
-                </li>
-            <% }); %>
-        </ul>
-    </div>
-</div>
-
-<!-- Palabras clave (Keywords) -->
-<div class="info-box">
-    <div class="info-box-icon">💡</div> <!-- Puedes usar un ícono aquí -->
-    <div class="info-box-title">Palabras Clave</div>
-    <div class="info-box-content">
-        <ul>
-            <% if (Array.isArray(movie.keywords) && movie.keywords.length > 0) { %>
-                <% movie.keywords.forEach((keyword) => { %>
-                    <li><%= keyword %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay palabras clave disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-</div>
-
-<!-- Idiomas -->
-<div class="info-box">
-    <div class="info-box-title">Idiomas</div>
-    <div class="flag-container">
-        <div class="flag-circle">
-            <img src="/united-states-of-america.png" alt="Inglés"> <!-- Bandera de Estados Unidos -->
-        </div>
-        <div class="flag-circle">
-            <img src="/round.png" alt="Portugués"> <!-- Bandera de Brasil -->
-        </div>
-        <div class="flag-circle">
-            <img src="/world.png" alt="Español"> <!-- Bandera de España -->
-        </div>
-    </div>
-    <div class="info-box-content">
-        <ul>
-            <% if (Array.isArray(movie.languages) && movie.languages.length > 0) { %>
-                <% movie.languages.forEach((language) => { %>
-                    <li><%= language %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay idiomas disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-</div>
-
-<!-- Géneros -->
-<div class="info-box">
-    <div class="info-box-title">Géneros</div>
-    <div class="info-box-content">
-        <ul>
-            <% if (Array.isArray(movie.genres) && movie.genres.length > 0) { %>
-                <% movie.genres.forEach((genre) => { %>
-                    <li><%= genre %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay géneros disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-</div>
-
-<!-- Países de Producción -->
-<div class="info-box">
-    <div class="info-box-title">Países de Producción</div>
-    <div class="info-box-content">
-        <ul>
-            <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
-                <%
-                    const paisesUnicos = new Set();
-                    movie.companies.forEach((company) => {
-                        paisesUnicos.add(company.country_name);
-                    });
-
-                Array.from(paisesUnicos).forEach((country) => { %>
-                    <li><%= country %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay países de producción disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-</div>
-
-<!-- Empresas de Producción -->
-<div class="info-box">
-    <div class="info-box-title">Empresas de Producción</div>
-    <div class="info-box-content">
-        <ul>
-            <% if (Array.isArray(movie.companies) && movie.companies.length > 0) { %>
-                <% movie.companies.forEach((company) => { %>
-                    <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay empresas de producción disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-</div>
-
+<!-- Enlace de retorno a la página principal -->
 <p></p>
-<!-- Botón para volver al buscador -->
 <div id="inicio"><a href="/">Inicio</a></div>
 
 </body>
