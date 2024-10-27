@@ -1,59 +1,83 @@
-<div id="usuarios">
-    <% if (users && users.length > 0) { %>
-        <% users.forEach(user => { %>
-            <div class="usuario">
-                <h2><%= user.user_name %> (<%= user.user_username %>)</h2>
-                <p>Email: <%= user.user_email %></p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
 
-                <% if (user.movies && user.movies.length > 0) { %>
-                    <h3>Películas que le gustan:</h3>
-                    <ul>
-                        <% user.movies.forEach(movie => { %>
-                            <li>
-                                <strong>Título:</strong> <%= movie.title %> <br>
-                                <strong>Puntuación:</strong> <%= movie.rating ? movie.rating : 'No calificado' %> <br>
-                                <strong>Opinión:</strong> <%= movie.opinion ? movie.opinion : 'Sin opinión' %>
-                            </li>
-                        <% }) %>
-                    </ul>
-                <% } else { %>
-                    <p>Este usuario no tiene películas favoritas registradas.</p>
-                <% } %>
+<div class="container">
+    <h1>Lista de Usuarios</h1>
 
-                <!-- Botón para modificar información del usuario -->
-                <button onclick="showEditForm(<%= user.user_id %>)">Modificar</button>
-
-                <!-- Formulario para eliminar usuario -->
-                <form action="/users/<%= user.user_id %>" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');" style="display:inline;">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit">Eliminar</button>
-                </form>
-
-                <!-- Formulario de edición que se muestra/oculta con JavaScript -->
-                <div id="editForm-<%= user.user_id %>" style="display:none;">
-                    <h3>Editar usuario</h3>
-                    <form action="/users/<%= user.user_id %>" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <label for="username">Username:</label>
-                        <input type="text" name="user_username" value="<%= user.user_username %>" required>
-                        <label for="name">Nombre:</label>
-                        <input type="text" name="user_name" value="<%= user.user_name %>" required>
-                        <label for="email">Email:</label>
-                        <input type="email" name="user_email" value="<%= user.user_email %>" required>
-                        <button type="submit">Guardar cambios</button>
-                    </form>
-                </div>
-            </div>
-            <hr> <!-- Línea horizontal para separar usuarios -->
-        <% }) %>
-    <% } else { %>
-        <p>No hay usuarios registrados.</p>
+    <% if (message) { %>
+        <div class="alert alert-success">
+            <%= message %>
+        </div>
     <% } %>
+
+    <div id="usuarios">
+        <% if (users && users.length > 0) { %>
+            <% users.forEach(user => { %>
+                <div class="usuario">
+                    <h2><%= user.user_name %> (<%= user.user_username %>)</h2>
+                    <p>Email: <%= user.user_email %></p>
+
+                    <% if (user.movies && user.movies.length > 0) { %>
+                        <h3>Películas que le gustan:</h3>
+                        <ul>
+                            <% user.movies.forEach(movie => { %>
+                                <li>
+                                    <strong>Título:</strong> <%= movie.title %> <br>
+                                    <strong>Puntuación:</strong> <%= movie.rating ? movie.rating : 'No calificado' %> <br>
+                                    <strong>Opinión:</strong> <%= movie.opinion ? movie.opinion : 'Sin opinión' %>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    <% } else { %>
+                        <p>Este usuario no tiene películas favoritas registradas.</p>
+                    <% } %>
+
+                    <!-- Botón para modificar información del usuario -->
+                    <button onclick="showEditForm(<%= user.user_id %>)">Modificar</button>
+
+                    <!-- Formulario para eliminar usuario -->
+                    <form action="/users/<%= user.user_id %>/delete" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');" style="display:inline;">
+                        <button type="submit">Eliminar</button>
+                    </form>
+
+                    <!-- Formulario de edición que se muestra/oculta con JavaScript -->
+                    <div id="editForm-<%= user.user_id %>" style="display:none;">
+                        <h3>Editar usuario</h3>
+                        <form action="/users/<%= user.user_id %>/edit" method="POST">
+                            <label for="username">Username:</label>
+                            <input type="text" name="user_username" value="<%= user.user_username %>" required>
+                            <label for="name">Nombre:</label>
+                            <input type="text" name="user_name" value="<%= user.user_name %>" required>
+                            <label for="email">Email:</label>
+                            <input type="email" name="user_email" value="<%= user.user_email %>" required>
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+                    </div>
+                </div>
+                <hr> <!-- Línea horizontal para separar usuarios -->
+            <% }) %>
+        <% } else { %>
+            <p>No hay usuarios registrados.</p>
+        <% } %>
+    </div>
+
+    <!-- Botón para volver al inicio -->
+    <a href="/" class="btn btn-primary">Volver al Inicio</a>
+
+    <script>
+        function showEditForm(userId) {
+            const form = document.getElementById(`editForm-${userId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 </div>
 
-<script>
-    function showEditForm(userId) {
-        const form = document.getElementById(`editForm-${userId}`);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-</script>
+</body>
+</html>

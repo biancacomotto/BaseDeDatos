@@ -2,6 +2,9 @@ const express = require('express');
 const sqlite3 = require('sqlite3');
 const ejs = require('ejs');
 const {Database} = require("sqlite3");
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,13 +14,13 @@ const port = process.env.PORT || 3000;
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
+app.use(express.static('public'));
 
 // Configuración de la base de datos
 const db = new sqlite3.Database('./movies.db'); //path
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
-
 
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
@@ -374,9 +377,14 @@ app.get('/director/:id', (req, res) => {
     });
 });
 
-const bodyParser = require('body-parser');
+// Configuración de body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Configuración de method-override
+app.use(methodOverride('_method'));
+
+
 
 // Crear un nuevo usuario
 app.post('/users', (req, res) => {
@@ -395,37 +403,41 @@ app.post('/users', (req, res) => {
 });
 
 // Modificar un usuario existente
-app.put('/users/:id', (req, res) => {
+
+// Modificar un usuario existente
+app.post('/users/:id/edit', (req, res) => {
     const { id } = req.params;
     const { user_username, user_name, user_email } = req.body;
-    const query = `
-        UPDATE users
-        SET user_username = ?, user_name = ?, user_email = ?
-        WHERE user_id = ?;
-    `;
+
+    const query = `UPDATE users SET user_username = ?, user_name = ?, user_email = ? WHERE user_id = ?;`;
     db.run(query, [user_username, user_name, user_email, id], function (err) {
         if (err) {
-            res.status(500).send("Error al actualizar el usuario.");
+            console.error(err); // Mostrar el error en la consola para depuración
+            return res.status(500).send("Error al actualizar el usuario.");
         } else {
-            res.send("Usuario actualizado correctamente.");
+            // Redirigir con un mensaje
+            return res.redirect('/users?message=Usuario actualizado correctamente');
         }
     });
 });
 
+
 // Eliminar un usuario
-app.delete('/users/:id', (req, res) => {
+app.post('/users/:id/delete', (req, res) => {
     const { id } = req.params;
-    const query = `
-        DELETE FROM users WHERE user_id = ?;
-    `;
+    const query = `DELETE FROM users WHERE user_id = ?;`;
     db.run(query, [id], function (err) {
         if (err) {
-            res.status(500).send("Error al eliminar el usuario.");
+            console.error(err); // Mostrar el error en la consola para depuración
+            return res.status(500).send("Error al eliminar el usuario.");
         } else {
-            res.send("Usuario eliminado correctamente.");
+            // Redirigir con un mensaje
+            return res.redirect('/users?message=Usuario eliminado correctamente');
         }
     });
 });
+
+
 
 // Listar todos los usuarios y sus películas con puntuación y opinión
 app.get('/users', (req, res) => {
@@ -461,7 +473,7 @@ app.get('/users', (req, res) => {
                 return acc;
             }, {});
             // Renderizar la vista users.ejs con los datos de usuarios
-            res.render('users', { users: Object.values(users) });
+             res.render('users', { users: Object.values(users), message: req.query.message });
         }
     });
 });
@@ -486,9 +498,7 @@ app.post('/users/:id/movies', (req, res) => {
     });
 });
 
-//const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+
 
 
 // Ruta para mostrar el formulario de registro
@@ -516,9 +526,7 @@ app.post('/register', (req, res) => {
     });
 });
 
-app.use(express.static('public'));
 
-//--------------------------
 
 // Iniciar el servidor
 app.listen(port, () => {
