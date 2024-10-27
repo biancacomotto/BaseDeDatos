@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 // Ruta para buscar películas, directores y actores
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
-    const tipoBusqueda = req.query.tipoBusqueda;  // Capturar el tipo de búsqueda del formulario
+    const tipoBusqueda = req.query.tipoBusqueda;
 
     const resultados = {
         searchTerm,
@@ -37,7 +37,6 @@ app.get('/buscar', (req, res) => {
     };
 
     if (tipoBusqueda === 'movie') {
-        // Consulta de películas
         const consultaMovies = `SELECT DISTINCT * FROM movie WHERE title LIKE ? ORDER BY title ASC;`;
         db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
             if (!err) {
@@ -47,7 +46,6 @@ app.get('/buscar', (req, res) => {
         });
 
     } else if (tipoBusqueda === 'actor') {
-        // Consulta de actores
         const consultaActores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_cast mc ON p.person_id = mc.person_id WHERE person_name LIKE ? ORDER BY person_name ASC;`;
         db.all(consultaActores, [`%${searchTerm}%`], (err, actorRows) => {
             if (!err) {
@@ -57,7 +55,6 @@ app.get('/buscar', (req, res) => {
         });
 
     } else if (tipoBusqueda === 'director') {
-        // Consulta de directores
         const consultaDirectores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_crew mc ON p.person_id = mc.person_id WHERE person_name LIKE ? AND mc.job = 'Director' ORDER BY person_name ASC;`;
         db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
             if (!err) {
@@ -65,46 +62,27 @@ app.get('/buscar', (req, res) => {
             }
             res.render('resultado', { resultados, tipoBusqueda });
         });
-    } else {
-        res.render('resultado', { resultados, tipoBusqueda });
+
+    } else if (tipoBusqueda === 'keyword') {
+        const consultaKeywords = `
+             select distinct *
+             from movie
+             join movie_keywords mk on movie.movie_id = mk.movie_id
+             join keyword k on k.keyword_id = mk.keyword_id
+             where keyword_name like ?
+             order by title asc;
+        `;
+        db.all(consultaKeywords, [`%${searchTerm}%`], (err, movieRows) => {
+            if (!err) {
+                resultados.movies = movieRows;
+            }
+            res.render('resultados_keyword', { resultados });
+        });
     }
 });
 
 
-// ----- INICIO: Rutas para el Buscador de Palabras Clave -----
 
-// Ruta para mostrar la página de búsqueda
-app.get('/search_keyword', (req, res) => {
-    // Envía el archivo EJS de la página de búsqueda al cliente
-    res.sendFile(path.join(__dirname, 'views', 'search_keyword.ejs'));
-});
-
-// Ruta para manejar la búsqueda de palabras clave
-app.get('/resultados_keyword', (req, res) => {
-    const keyword = req.query.keyword; // Obtiene la palabra clave del parámetro de consulta
-    // SQL para seleccionar películas que están relacionadas con la palabra clave
-    const sql = `
-        SELECT movie.id, movie.title
-        FROM movie
-                 JOIN movie_keywords ON movie.id = movie_keywords.movie_id
-                 JOIN keyword ON movie_keywords.keyword_id = keyword.id
-        WHERE keyword.name LIKE ?
-        order by title asc;
-    `;
-
-    // Ejecuta la consulta a la base de datos
-    db.all(sql, [`%${keyword}%`], (err, movies) => {
-        if (err) {
-            // Manejo de errores
-            res.status(500).send('Error en la base de datos');
-            return; // Termina la ejecución de la función
-        }
-        // Renderiza la página de resultados con las películas encontradas y la palabra clave
-        res.render('resultados_keyword', { keyword: keyword, movies: movies });
-    });
-});
-
-// ----- FIN: Rutas para el Buscador de Palabras Clave -----
 
 
 // Ruta para la página de datos de una película particular
