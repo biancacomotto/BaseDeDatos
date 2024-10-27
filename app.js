@@ -18,6 +18,7 @@ const db = new sqlite3.Database('./movies.db'); //path
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
 
+
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
     res.render('index');
@@ -80,9 +81,6 @@ app.get('/buscar', (req, res) => {
         });
     }
 });
-
-
-
 
 
 // Ruta para la página de datos de una película particular
@@ -428,49 +426,6 @@ app.delete('/users/:id', (req, res) => {
         }
     });
 });
-// PUNTO 6 ////////----------
-// creo tablas
-//Tabla de Usuarios
-// Configuración de la base de datos
-//const sqlite3 = require('sqlite3').verbose();
-//const db = new sqlite3.Database('./movies.db', (err) => {
-
-// Crear tablas si no existen
-db.serialize(() => {
-    // Crear tabla users
-    db.run(`
-                CREATE TABLE IF NOT EXISTS users (
-                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_username TEXT NOT NULL UNIQUE,
-                    user_name TEXT NOT NULL,
-                    user_email TEXT NOT NULL UNIQUE
-                )
-            `, (err) => {
-        if (err) {
-            console.error("Error al crear la tabla users:", err.message);
-        }
-    });
-
-    // Crear tabla movie_user
-    db.run(`
-                CREATE TABLE IF NOT EXISTS movie_user (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    movie_id INTEGER NOT NULL,
-                    rating INTEGER CHECK(rating BETWEEN 1 AND 5),
-                    opinion TEXT,
-                    FOREIGN KEY (user_id) REFERENCES users(user_id),
-                    FOREIGN KEY (movie_id) REFERENCES movie(movie_id)
-                )
-            `, (err) => {
-        if (err) {
-            console.error("Error al crear la tabla movie_user:", err.message);
-        }
-    });
-});
-
-
-
 
 // Listar todos los usuarios y sus películas con puntuación y opinión
 app.get('/users', (req, res) => {
