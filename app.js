@@ -11,6 +11,7 @@ const port = process.env.PORT || 3000;
 //const db = new sqlite3.Database('./movies.db'); //path
 
 
+
 // Serve static files from the "views" directory
 app.use(express.static('views'));
 app.use(express.static('public'));
@@ -472,7 +473,7 @@ app.get('/users', (req, res) => {
                 return acc;
             }, {});
             // Renderizar la vista users.ejs con los datos de usuarios
-             res.render('users', { users: Object.values(users), message: req.query.message });
+            res.render('users', { users: Object.values(users), message: req.query.message });
         }
     });
 });
@@ -525,11 +526,52 @@ app.post('/register', (req, res) => {
     });
 });
 
+//-------------------
+//------------------------------AGREGOOOO
 
+
+// Ruta para agregar una película a la lista del usuario
+app.post('/agregar-pelicula', (req, res) => {
+    const { user_id, movie_id, rating, opinion } = req.body;
+
+    const insertQuery = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
+    db.run(insertQuery, [user_id, movie_id, rating, opinion], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al agregar la película a la lista.');
+        }
+        res.redirect('/'); // Redirigir a la página principal o a donde desees
+    });
+});
+
+// Ruta para obtener las películas de un usuario
+app.get('/usuario/:id/peliculas', (req, res) => {
+    const userId = req.params.id;
+
+    const query = `
+        SELECT m.title, mu.rating, mu.opinion 
+        FROM movie_user mu
+        JOIN movie m ON mu.movie_id = m.movie_id
+        WHERE mu.user_id = ?;
+    `;
+
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al cargar las películas del usuario.');
+        }
+        res.render('peliculas_usuario', { userId, movies: rows });
+    });
+});
+
+
+
+//--------------------------
+
+
+//---------------------
 
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor en ejecución en http://localhost:${port}`);
 });
-
-

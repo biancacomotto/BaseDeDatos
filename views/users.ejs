@@ -8,8 +8,6 @@
 </head>
 <body>
 
-
-
 <div class="container">
     <h1>Lista de Usuarios</h1>
 
@@ -48,6 +46,9 @@
                     <form action="/users/<%= user.user_id %>/delete" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');" style="display:inline;">
                         <button type="submit">Eliminar</button>
                     </form>
+
+                    <!-- Botón para ver películas de este usuario -->
+                    <a href="/usuario/<%= user.user_id %>/peliculas" class="btn btn-link">Ver películas de este usuario</a>
 
                     <!-- Formulario de edición que se muestra/oculta con JavaScript -->
                     <div id="editForm-<%= user.user_id %>" style="display:none;">

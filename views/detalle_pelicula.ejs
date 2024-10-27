@@ -1,0 +1,9 @@
+<form action="/agregar-pelicula" method="POST">
+    <input type="hidden" name="user_id" value="<%= currentUser.id %>">
+    <input type="hidden" name="movie_id" value="<%= movie.id %>">
+    <label for="rating">Puntuación:</label>
+    <input type="number" name="rating" min="1" max="10" required>
+    <label for="opinion">Opinión:</label>
+    <textarea name="opinion" required></textarea>
+    <button type="submit">Agregar a mi lista</button>
+</form>
