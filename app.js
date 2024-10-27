@@ -10,6 +10,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 //const db = new sqlite3.Database('./movies.db'); //path
 
+// Configuracion
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
