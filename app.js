@@ -567,6 +567,104 @@ app.get('/usuario/:id/peliculas', (req, res) => {
 
 
 //--------------------------
+//const express = require('express'); // Asegúrate de incluir esta línea
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+//const sqlite3 = require('sqlite3').verbose(); // Asegúrate de incluir sqlite3
+
+//const app = express(); // Inicializar la aplicación de Express
+
+// Middleware para analizar el cuerpo de las solicitudes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Configuración de la sesión
+app.use(session({
+    secret: 'tu_secreto', // Cambia esto a un valor único y secreto
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Cambia a true si usas HTTPS
+}));
+
+// Ruta para mostrar el formulario de inicio de sesión
+app.get('/login', (req, res) => {
+    // Mostrar el mensaje de error si existe
+    const errorMessage = req.session.error ? req.session.error : '';
+    req.session.error = null; // Limpiar el mensaje de error después de mostrarlo
+
+    res.send(`
+        <form action="/login" method="POST">
+            <label for="user_username">Nombre de usuario:</label>
+            <input type="text" name="user_username" id="user_username" required>
+            <label for="user_password">Contraseña:</label>
+            <input type="password" name="user_password" id="user_password" required>
+            <button type="submit">Iniciar sesión</button>
+            <div style="color: red;">${errorMessage}</div> <!-- Mostrar el mensaje de error aquí -->
+        </form>
+    `);
+});
+
+// Ruta para manejar el inicio de sesión
+app.post('/login', (req, res) => {
+    const username = req.body.user_username;
+    const password = req.body.user_password;
+
+    // Conexión a la base de datos
+    const db = new sqlite3.Database('./movies.db');
+
+    db.get('SELECT * FROM users WHERE user_username = ?', [username], (err, user) => {
+        if (err) {
+            console.error(err.message);
+            req.session.error = 'Error en el servidor.';
+            return res.redirect('/login');
+        }
+
+        if (user) {
+            bcrypt.compare(password, user.user_password, (err, isMatch) => {
+                if (err) {
+                    console.error(err);
+                    req.session.error = 'Error en el servidor.';
+                    return res.redirect('/login');
+                }
+
+                if (isMatch) {
+                    req.session.userId = user.user_id;
+                    req.session.userName = user.user_name; // Almacenar el nombre para mostrar después
+                    return res.redirect('/'); // Redirige a la página principal
+                } else {
+                    req.session.error = 'Contraseña incorrecta.';
+                    return res.redirect('/login');
+                }
+            });
+        } else {
+            req.session.error = 'Nombre de usuario no encontrado.';
+            return res.redirect('/login');
+        }
+    });
+});
+
+// Ruta para mostrar la página principal
+app.get('/', (req, res) => {
+    const username = req.session.userName; // Obtener el nombre de usuario de la sesión
+    res.send(`
+        <h1>Hola, ${username ? username : 'Visitante'}!</h1>
+        <a href="/login">Iniciar sesión</a>
+        <a href="/logout">Cerrar sesión</a>
+    `);
+});
+
+// Ruta para manejar el cierre de sesión
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error(err);
+            return res.redirect('/'); // Redirigir a la página principal en caso de error
+        }
+        res.redirect('/'); // Redirigir a la página principal después de cerrar sesión
+    });
+});
+
+
 
 
 //---------------------
