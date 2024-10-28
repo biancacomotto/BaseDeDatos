@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar Películas</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Buscar Películas</h1>
+<div id="movie-results">
+    <% movies.forEach(movie => { %>
+        <div class="movie">
+            <h2><%= movie.title %></h2>
+            <p><%= movie.description %></p>
+            <button onclick="addToMyList('<%= movie.id %>', '<%= userId %>')">Agregar a mi lista</button>
+        </div>
+    <% }); %>
+</div>
+
+<script>
+    function addToMyList(movieId, userId) {
+        const rating = prompt("Ingresa tu calificación:");
+        const opinion = prompt("Ingresa tu opinión:");
+
+        fetch('/agregar-pelicula', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_id: userId, movie_id: movieId, rating: rating, opinion: opinion })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                // Aquí puedes actualizar la UI si es necesario
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+</body>
+</html>
