@@ -1,0 +1,10 @@
+<h2>Mis Películas</h2>
+<ul>
+    <% movies.forEach(movie => { %>
+        <li>
+            <strong><%= movie.title %></strong> - <%= movie.rating %> estrellas
+            <p>Opinión: <%= movie.opinion %></p>
+        </li>
+    <% }); %>
+</ul>
+<a href="/logout">Cerrar Sesión</a>

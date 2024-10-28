@@ -8,6 +8,17 @@
 <h1><%= movie.title %></h1>
 <h3>Fecha: <%= movie.release_date %></h3>
 
+<!-- Nuevo formulario para agregar película -->
+<h1><%= movie.title %></h1>
+<form action="/agregar-pelicula" method="POST">
+    <input type="hidden" name="movie_id" value="<%= movie.movie_id %>">
+    <label for="rating">Calificación:</label>
+    <input type="number" name="rating" min="1" max="5" required>
+    <label for="opinion">Opinión:</label>
+    <textarea name="opinion" required></textarea>
+    <button type="submit">Agregar a mi lista</button>
+</form>
+
 <!-- Dirigida por -->
 <div class="info-box">
     <div class="info-box-title">Dirigida por</div>
