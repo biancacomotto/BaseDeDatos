@@ -3,39 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Películas de Usuario</title>
-    <link rel="stylesheet" href="/styles.css"> <!-- Asegúrate de tener una hoja de estilos si la necesitas -->
+    <title>Películas del Usuario</title>
 </head>
 <body>
-<header>
-    <h1>Películas Favoritas</h1>
-</header>
-<main>
-    <% if (peliculas.length > 0) { %>
-        <table>
-            <thead>
+<h1>Películas del Usuario</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Título</th>
+        <th>Puntuación</th>
+        <th>Opinión</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% if (movies.length > 0) { %>
+        <% movies.forEach(movie => { %>
             <tr>
-                <th>Título</th>
-                <th>Puntuación</th>
-                <th>Opinión</th>
+                <td><%= movie.title %></td>
+                <td><%= movie.rating %></td>
+                <td><%= movie.opinion %></td>
             </tr>
-            </thead>
-            <tbody>
-            <% peliculas.forEach(function(pelicula) { %>
-                <tr>
-                    <td><%= pelicula.title %></td>
-                    <td><%= pelicula.rating %></td>
-                    <td><%= pelicula.opinion %></td>
-                </tr>
-            <% }); %>
-            </tbody>
-        </table>
+        <% }) %>
     <% } else { %>
-        <p>No hay películas favoritas para este usuario.</p>
+        <tr>
+            <td colspan="3">No hay películas en la lista.</td>
+        </tr>
     <% } %>
-</main>
-<footer>
-    <a href="/usuarios">Volver a la lista de usuarios</a>
-</footer>
+    </tbody>
+</table>
+<a href="/">Volver a la página principal</a>
 </body>
 </html>

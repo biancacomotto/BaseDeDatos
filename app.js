@@ -2,7 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3');
 const ejs = require('ejs');
 const {Database} = require("sqlite3");
-//HOLAAA
+
 const app = express();
 const port = process.env.PORT || 3000;
 //const db = new sqlite3.Database('./movies.db'); //path

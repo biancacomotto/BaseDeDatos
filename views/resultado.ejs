@@ -7,43 +7,51 @@
 <body>
 <h1>Resultado de la Búsqueda</h1>
 
-<!-- Sección de Películas -->
-<h2>Películas</h2>
-<% if (resultados.movies.length === 0) { %>
-    <p>No se encontraron películas.</p>
-<% } else { %>
-    <ul>
-        <% resultados.movies.forEach((movie) => { %>
-            <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></li>
-        <% }); %>
-    </ul>
+<!-- Sección de Películas (solo se muestra si el tipo de búsqueda es 'movie') -->
+<% if (tipoBusqueda === 'movie') { %>
+    <h2>Películas</h2>
+    <% if (resultados.movies.length === 0) { %>
+        <p>No se encontraron películas.</p>
+    <% } else { %>
+        <ul>
+            <% resultados.movies.forEach((movie) => { %>
+                <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></li>
+            <% }); %>
+        </ul>
+    <% } %>
 <% } %>
 
-<!-- Sección de Actores -->
-<h2>Actores</h2>
-<% if (resultados.actors.length === 0) { %>
-    <p>No se encontraron actores.</p>
-<% } else { %>
-    <ul>
-        <% resultados.actors.forEach((actor) => { %>
-            <li><a href="/actor/<%= actor.person_id %>"><%= actor.person_name %></a></li>
-        <% }); %>
-    </ul>
+<!-- Sección de Actores (solo se muestra si el tipo de búsqueda es 'actor') -->
+<% if (tipoBusqueda === 'actor') { %>
+    <h2>Actores</h2>
+    <% if (resultados.actors.length === 0) { %>
+        <p>No se encontraron actores.</p>
+    <% } else { %>
+        <ul>
+            <% resultados.actors.forEach((actor) => { %>
+                <li><a href="/actor/<%= actor.person_id %>"><%= actor.person_name %></a></li>
+            <% }); %>
+        </ul>
+    <% } %>
 <% } %>
 
-<!-- Sección de Directores -->
-<h2>Directores</h2>
-<% if (resultados.directors.length === 0) { %>
-    <p>No se encontraron directores.</p>
-<% } else { %>
-    <ul>
-        <% resultados.directors.forEach((director) => { %>
-            <li><a href="/director/<%= director.person_id %>"><%= director.person_name %></a></li>
-        <% }); %>
-    </ul>
+<!-- Sección de Directores (solo se muestra si el tipo de búsqueda es 'director') -->
+<% if (tipoBusqueda === 'director') { %>
+    <h2>Directores</h2>
+    <% if (resultados.directors.length === 0) { %>
+        <p>No se encontraron directores.</p>
+    <% } else { %>
+        <ul>
+            <% resultados.directors.forEach((director) => { %>
+                <li><a href="/director/<%= director.person_id %>"><%= director.person_name %></a></li>
+            <% }); %>
+        </ul>
+    <% } %>
 <% } %>
 
+<!-- Enlace de retorno a la página principal -->
 <p></p>
 <div id="inicio"><a href="/">Inicio</a></div>
+
 </body>
 </html>
