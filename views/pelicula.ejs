@@ -82,21 +82,31 @@
 </div>
 
 <!-- Palabras clave (Keywords) -->
-<div class="info-box">
-    <div class="info-box-icon">💡</div> <!-- Puedes usar un ícono aquí -->
-    <div class="info-box-title">Palabras Clave</div>
-    <div class="info-box-content">
-        <ul>
-            <% if (Array.isArray(movie.keywords) && movie.keywords.length > 0) { %>
-                <% movie.keywords.forEach((keyword) => { %>
-                    <li><%= keyword %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay palabras clave disponibles.</li>
-            <% } %>
-        </ul>
+<div class="container-card">
+    <div class="card">
+        <!-- Aquí omitimos la figura y la imagen, manteniendo el contenido -->
+        <div class="contenido-card">
+            <!-- Mantendremos el ícono y el título como estaban en el código original -->
+            <div class="info-box-icon">💡</div>
+            <h3>Palabras Clave</h3>
+            <p>
+                <!-- Aquí mantenemos la lógica de las palabras clave -->
+            <ul>
+                <% if (Array.isArray(movie.keywords) && movie.keywords.length > 0) { %>
+                    <% movie.keywords.forEach((keyword) => { %>
+                        <li><%= keyword %></li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No hay palabras clave disponibles.</li>
+                <% } %>
+            </ul>
+            </p>
+            <a href="#">Leer Màs</a>
+        </div>
     </div>
 </div>
+
+
 
 <!-- Idiomas -->
 <div class="info-box">
