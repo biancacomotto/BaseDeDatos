@@ -1,9 +1,11 @@
 const express = require('express');
-const sqlite3 = require('sqlite3');
+const sqlite3 = require('sqlite3').verbose();
+const session = require('express-session');
 const ejs = require('ejs');
 const {Database} = require("sqlite3");
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const bcrypt = require('bcrypt');
 
 
 const app = express();
@@ -405,7 +407,6 @@ app.post('/users', (req, res) => {
 
 // Modificar un usuario existente
 
-// Modificar un usuario existente
 app.post('/users/:id/edit', (req, res) => {
     const { id } = req.params;
     const { user_username, user_name, user_email } = req.body;
@@ -438,144 +439,6 @@ app.post('/users/:id/delete', (req, res) => {
     });
 });
 
-
-
-// Listar todos los usuarios y sus películas con puntuación y opinión
-app.get('/users', (req, res) => {
-    const query = `
-        SELECT u.user_id, u.user_username, u.user_name, u.user_email,
-               m.title AS movie_title, mu.rating, mu.opinion
-        FROM users u
-                 LEFT JOIN movie_user mu ON u.user_id = mu.user_id
-                 LEFT JOIN movie m ON mu.movie_id = m.movie_id
-        ORDER BY u.user_id;
-    `;
-    db.all(query, (err, rows) => {
-        if (err) {
-            res.status(500).send("Error al listar los usuarios.");
-        } else {
-            // Estructura los datos en un formato adecuado
-            const users = rows.reduce((acc, row) => {
-                const user = acc[row.user_id] || {
-                    user_id: row.user_id,
-                    user_username: row.user_username,
-                    user_name: row.user_name,
-                    user_email: row.user_email,
-                    movies: []
-                };
-                if (row.movie_title) {
-                    user.movies.push({
-                        title: row.movie_title,
-                        rating: row.rating,
-                        opinion: row.opinion
-                    });
-                }
-                acc[row.user_id] = user;
-                return acc;
-            }, {});
-            // Renderizar la vista users.ejs con los datos de usuarios
-            res.render('users', { users: Object.values(users), message: req.query.message });
-        }
-    });
-});
-
-
-
-
-/// Asociar una película a un usuario con puntuación y opinión
-app.post('/users/:id/movies', (req, res) => {
-    const { id } = req.params;
-    const { movie_id, rating, opinion } = req.body;
-    const query = `
-        INSERT INTO movie_user (user_id, movie_id, rating, opinion)
-        VALUES (?, ?, ?, ?);
-    `;
-    db.run(query, [id, movie_id, rating, opinion], function (err) {
-        if (err) {
-            res.status(500).send("Error al asociar la película al usuario.");
-        } else {
-            res.status(201).send("Película asociada al usuario correctamente.");
-        }
-    });
-});
-
-
-
-
-// Ruta para mostrar el formulario de registro
-app.get('/register', (req, res) => {
-    res.render('register', { message: null });
-});
-
-// Ruta para manejar el envío del formulario de registro
-app.post('/register', (req, res) => {
-    const { user_username, user_name, user_email } = req.body;
-
-    // SQL para insertar un nuevo usuario
-    const query = `
-        INSERT INTO users (user_username, user_name, user_email)
-        VALUES (?, ?, ?);
-    `;
-
-    db.run(query, [user_username, user_name, user_email], (err) => {
-        if (err) {
-            console.error("Error al registrar el usuario:", err.message);
-            res.render('register', { message: "Error al registrar el usuario. Inténtalo de nuevo." });
-        } else {
-            res.render('register', { message: "Usuario registrado con éxito." });
-        }
-    });
-});
-
-//-------------------
-//------------------------------AGREGOOOO
-
-
-// Ruta para agregar una película a la lista del usuario
-app.post('/agregar-pelicula', (req, res) => {
-    const { user_id, movie_id, rating, opinion } = req.body;
-
-    const insertQuery = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
-    db.run(insertQuery, [user_id, movie_id, rating, opinion], (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al agregar la película a la lista.');
-        }
-        res.redirect('/'); // Redirigir a la página principal o a donde desees
-    });
-});
-
-// Ruta para obtener las películas de un usuario
-app.get('/usuario/:id/peliculas', (req, res) => {
-    const userId = req.params.id;
-
-    const query = `
-        SELECT m.title, mu.rating, mu.opinion 
-        FROM movie_user mu
-        JOIN movie m ON mu.movie_id = m.movie_id
-        WHERE mu.user_id = ?;
-    `;
-
-    db.all(query, [userId], (err, rows) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al cargar las películas del usuario.');
-        }
-        res.render('peliculas_usuario', { userId, movies: rows });
-    });
-});
-
-
-
-//--------------------------
-//const express = require('express'); // Asegúrate de incluir esta línea
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-//const sqlite3 = require('sqlite3').verbose(); // Asegúrate de incluir sqlite3
-
-//const app = express(); // Inicializar la aplicación de Express
-
-// Middleware para analizar el cuerpo de las solicitudes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -587,11 +450,43 @@ app.use(session({
     cookie: { secure: false } // Cambia a true si usas HTTPS
 }));
 
+// Ruta para mostrar el formulario de registro
+app.get('/register', (req, res) => {
+    res.render('register', { message: null });
+});
+
+// Ruta para manejar el envío del formulario de registro
+app.post('/register', (req, res) => {
+    const { user_username, user_name, user_email, user_password } = req.body;
+
+    // Hashear la contraseña
+    bcrypt.hash(user_password, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error("Error al registrar el usuario:", err.message);
+            res.render('register', { message: "Error al registrar el usuario. Inténtalo de nuevo." });
+            return;
+        }
+
+        const query = `
+            INSERT INTO users (user_username, user_name, user_email, user_password)
+            VALUES (?, ?, ?, ?);
+        `;
+
+        db.run(query, [user_username, user_name, user_email, hashedPassword], (err) => {
+            if (err) {
+                console.error("Error al registrar el usuario:", err.message);
+                res.render('register', { message: "Error al registrar el usuario. Inténtalo de nuevo." });
+            } else {
+                res.render('register', { message: "Usuario registrado con éxito." });
+            }
+        });
+    });
+});
+
 // Ruta para mostrar el formulario de inicio de sesión
 app.get('/login', (req, res) => {
-    // Mostrar el mensaje de error si existe
     const errorMessage = req.session.error ? req.session.error : '';
-    req.session.error = null; // Limpiar el mensaje de error después de mostrarlo
+    req.session.error = null;
 
     res.send(`
         <form action="/login" method="POST">
@@ -600,7 +495,7 @@ app.get('/login', (req, res) => {
             <label for="user_password">Contraseña:</label>
             <input type="password" name="user_password" id="user_password" required>
             <button type="submit">Iniciar sesión</button>
-            <div style="color: red;">${errorMessage}</div> <!-- Mostrar el mensaje de error aquí -->
+            <div style="color: red;">${errorMessage}</div>
         </form>
     `);
 });
@@ -609,9 +504,6 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
     const username = req.body.user_username;
     const password = req.body.user_password;
-
-    // Conexión a la base de datos
-    const db = new sqlite3.Database('./movies.db');
 
     db.get('SELECT * FROM users WHERE user_username = ?', [username], (err, user) => {
         if (err) {
@@ -629,9 +521,10 @@ app.post('/login', (req, res) => {
                 }
 
                 if (isMatch) {
-                    req.session.userId = user.user_id;
-                    req.session.userName = user.user_name; // Almacenar el nombre para mostrar después
-                    return res.redirect('/'); // Redirige a la página principal
+                    // Almacena el usuario en la sesión
+                    req.session.user = user; // Asegúrate de que esto se esté ejecutando
+                    console.log('Usuario autenticado:', req.session.user); // Log de usuario autenticado
+                    return res.redirect('/'); // Redirige a la página principal después de iniciar sesión
                 } else {
                     req.session.error = 'Contraseña incorrecta.';
                     return res.redirect('/login');
@@ -646,22 +539,61 @@ app.post('/login', (req, res) => {
 
 // Ruta para mostrar la página principal
 app.get('/', (req, res) => {
-    const username = req.session.userName; // Obtener el nombre de usuario de la sesión
-    res.send(`
-        <h1>Hola, ${username ? username : 'Visitante'}!</h1>
+    console.log('Sesión actual:', req.session); // Log de sesión actual
+    const username = req.session.user ? req.session.user.user_name : 'Visitante';
+
+    // Asegúrate de que esta lógica esté bien
+    const userLinks = req.session.user ? `
+        <a href="/profile">Perfil</a>
+        <form action="/logout" method="POST" style="display:inline;">
+            <button type="submit">Cerrar sesión</button>
+        </form>
+    ` : `
         <a href="/login">Iniciar sesión</a>
-        <a href="/logout">Cerrar sesión</a>
+        <a href="/register">Registrar nuevo usuario</a>
+    `;
+
+    // Mensaje de bienvenida para usuarios autenticados
+    const welcomeMessage = req.session.user ? `<h1>Bienvenido, ${username}!</h1>` : `<h1>Hola, ${username}!</h1>`;
+
+    res.send(`
+        ${welcomeMessage}
+        <div>${userLinks}</div>
+        <a href="/users">Listar usuarios</a>
     `);
 });
 
+// Ruta para mostrar el perfil de usuario
+app.get('/profile', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login'); // Redirige a login si no está autenticado
+    }
+    console.log('Perfil de usuario:', req.session.user); // Log para verificar los datos del usuario
+    res.render('profile', { user: req.session.user }); // Asegúrate de que el render funcione bien
+});
+
+
 // Ruta para manejar el cierre de sesión
-app.get('/logout', (req, res) => {
+app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error(err);
             return res.redirect('/'); // Redirigir a la página principal en caso de error
         }
         res.redirect('/'); // Redirigir a la página principal después de cerrar sesión
+    });
+});
+
+// Ruta para listar usuarios
+app.get('/users', (req, res) => {
+    const query = `SELECT * FROM users;`;
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err.message);
+            return res.status(500).send("Error al obtener usuarios.");
+        }
+        res.render('users', { users: users, message: null });
     });
 });
 
