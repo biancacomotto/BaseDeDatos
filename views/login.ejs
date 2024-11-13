@@ -70,18 +70,18 @@
     </style>
 </head>
 <body>
-    <form action="/login" method="POST">
-        <h2>Iniciar Sesión</h2>
-        <input type="text" name="user_username" placeholder="Usuario" required>
-        <input type="password" name="user_password" placeholder="Contraseña" required>
-        <button type="submit">Iniciar Sesión</button>
+<form action="/login" method="POST">
+    <h2>Iniciar Sesión</h2>
+    <input type="text" name="user_username" placeholder="Usuario" required>
+    <input type="password" name="user_password" placeholder="Contraseña" required>
+    <button type="submit">Iniciar Sesión</button>
 
-        <% if (errorMessage) { %>
-            <div class="error-message"><%= errorMessage %></div>
-            <% if (showRegisterButton) { %>
-                <a href="/register" class="register-button">Registrarse</a>
-            <% } %>
+    <% if (errorMessage) { %>
+        <div class="error-message"><%= errorMessage %></div>
+        <% if (showRegisterButton) { %>
+            <a href="/register" class="register-button">Registrarse</a>
         <% } %>
-    </form>
+    <% } %>
+</form>
 </body>
 </html>

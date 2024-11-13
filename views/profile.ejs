@@ -36,24 +36,42 @@
         .movie-item:last-child {
             border-bottom: none;
         }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h2>Perfil de <%= username %></h2>
+<h2>Perfil de <%= username %></h2>
 
-    <div class="movie-list">
-        <h3>Películas en tu lista:</h3>
-        <% if (movies.length > 0) { %>
-            <% movies.forEach(movie => { %>
-                <div class="movie-item">
-                    <h4><%= movie.title %></h4>
-                    <p>Calificación: <%= movie.rating %>/5</p>
-                    <p>Opinión: <%= movie.opinion %></p>
-                </div>
-            <% }) %>
-        <% } else { %>
-            <p>No has agregado películas a tu lista.</p>
-        <% } %>
-    </div>
+<div class="movie-list">
+    <h3>Películas en tu lista:</h3>
+    <% if (movies.length > 0) { %>
+        <% movies.forEach(movie => { %>
+            <div class="movie-item">
+                <h4><%= movie.title %></h4>
+                <p>Calificación: <%= movie.rating %>/5</p>
+                <p>Opinión: <%= movie.opinion %></p>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No has agregado películas a tu lista.</p>
+    <% } %>
+</div>
+
+<!-- Botón para volver al inicio -->
+<a href="/" class="button">Volver al inicio</a>
 </body>
 </html>
