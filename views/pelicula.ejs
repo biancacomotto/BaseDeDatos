@@ -5,33 +5,33 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<h1><%= movie.title %></h1>
-<h3>Fecha: <%= movie.release_date %></h3>
+    <h1><%= movie.title %></h1>
+    <h3>Fecha: <%= movie.release_date %></h3>
 
-<!-- Nuevo formulario para agregar película -->
-<h1><%= movie.title %></h1>
-<form action="/agregar-pelicula" method="POST">
-    <input type="hidden" name="movie_id" value="<%= movie.movie_id %>">
-    <label for="rating">Calificación:</label>
-    <input type="number" name="rating" min="1" max="5" required>
-    <label for="opinion">Opinión:</label>
-    <textarea name="opinion" required></textarea>
-    <button type="submit">Agregar a mi lista</button>
-</form>
+    <!-- Formulario para agregar película a favoritos -->
+ <form action="/agregar-pelicula" method="POST">
+     <input type="hidden" name="movieId" value="<%= movie.id %>">
+     <label for="rating">Calificación:</label>
+     <input type="number" name="rating" min="1" max="5" required>
+     <label for="opinion">Opinión:</label>
+     <textarea name="opinion" required></textarea>
+     <button type="submit">Agregar a favoritos</button>
+ </form>
 
-<!-- Dirigida por -->
-<div class="info-box">
-    <div class="info-box-title">Dirigida por</div>
-    <div class="info-box-content">
-        <ul>
-            <% movie.directors.forEach((director) => { %>
-                <li>
-                    <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
-                </li>
-            <% }); %>
-        </ul>
+
+    <!-- Dirigida por -->
+    <div class="info-box">
+        <div class="info-box-title">Dirigida por</div>
+        <div class="info-box-content">
+            <ul>
+                <% movie.directors.forEach((director) => { %>
+                    <li>
+                        <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
     </div>
-</div>
 
 <!-- Escrita por -->
 <div class="info-box">

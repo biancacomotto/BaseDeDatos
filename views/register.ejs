@@ -1,47 +1,30 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuario</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- Bootstrap para estilos -->
 </head>
 <body>
-
-<div class="container">
     <h1>Registro de Usuario</h1>
-
     <form action="/register" method="POST">
-        <div class="form-group">
-            <label for="user_username">Nombre de usuario:</label>
-            <input type="text" class="form-control" id="user_username" name="user_username" required>
-        </div>
+        <label for="user_username">Nombre de usuario:</label>
+        <input type="text" name="user_username" id="user_username" required>
 
-        <div class="form-group">
-            <label for="user_name">Nombre completo:</label>
-            <input type="text" class="form-control" id="user_name" name="user_name" required>
-        </div>
+        <label for="user_name">Nombre completo:</label>
+        <input type="text" name="user_name" id="user_name" required>
 
-        <div class="form-group">
-            <label for="user_email">Correo electrónico:</label>
-            <input type="email" class="form-control" id="user_email" name="user_email" required>
-        </div>
+        <label for="user_email">Email:</label>
+        <input type="email" name="user_email" id="user_email" required>
 
-        <div class="form-group">
-            <label for="user_password">Contraseña:</label>
-            <input type="password" class="form-control" id="user_password" name="user_password" required>
-        </div>
+        <label for="user_password">Contraseña:</label>
+        <input type="password" name="user_password" id="user_password" required>
 
-        <button type="submit" class="btn btn-primary">Registrar</button>
+        <button type="submit">Registrar</button>
     </form>
 
+    <!-- Muestra el mensaje de éxito o error, si existe -->
     <% if (message) { %>
-        <div class="alert alert-success mt-3">
-            <%= message %>
-        </div>
-        <a href="/" class="btn btn-primary mt-2">Volver al Inicio</a> <!-- Botón para volver al inicio -->
+        <p><%= message %></p>
     <% } %>
-</div>
-
 </body>
 </html>

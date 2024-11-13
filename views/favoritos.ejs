@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas Favoritas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Películas Favoritas</h1>
+
+    <% if (movies && movies.length > 0) { %>
+        <ul class="list-group">
+            <% movies.forEach(movie => { %>
+                <li class="list-group-item">
+                    <strong>Título:</strong> <%= movie.title %> <br>
+                    <strong>Puntuación:</strong> <%= movie.rating ? movie.rating : 'No calificado' %> <br>
+                    <strong>Opinión:</strong> <%= movie.opinion ? movie.opinion : 'Sin opinión' %>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>No hay películas favoritas registradas para este usuario.</p>
+    <% } %>
+
+    <!-- Botón para volver a la lista de usuarios -->
+    <a href="/users" class="btn btn-primary mt-3">Volver a la lista de usuarios</a>
+</div>
+</body>
+</html>

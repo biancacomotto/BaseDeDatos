@@ -1,36 +1,80 @@
+// Importación de módulos y configuración inicial
 const express = require('express');
-const sqlite3 = require('sqlite3');
+const sqlite3 = require('sqlite3').verbose();
+const session = require('express-session');
 const ejs = require('ejs');
-const {Database} = require("sqlite3");
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const bcrypt = require('bcrypt');
+const { LocalStorage } = require('node-localstorage');
 
 
+const localStorage = new LocalStorage('./scratch');
 const app = express();
 const port = process.env.PORT || 3000;
-//const db = new sqlite3.Database('./movies.db'); //path
 
-
-
-// Serve static files from the "views" directory
+// Configuración de middlewares y archivos estáticos
 app.use(express.static('views'));
 app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(methodOverride('_method'));
+
+// Configuración del motor de plantillas EJS
+app.set('view engine', 'ejs');
+
+// Configuración de la sesión
+app.use(session({
+    secret: 'tu_secreto', // Cambia esto a un valor único y secreto
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Cambia a true si usas HTTPS
+}));
 
 // Configuración de la base de datos
-const db = new sqlite3.Database('./movies.db'); //path
+const db = new sqlite3.Database('./movies.db');
 
-// Configurar el motor de plantillas EJS
-app.set('view engine', 'ejs');
+// Crear la tabla favoritos si no existe
+db.run(`
+    CREATE TABLE IF NOT EXISTS favoritos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        movie_id INTEGER NOT NULL,
+        rating INTEGER CHECK(rating BETWEEN 1 AND 5),
+        opinion TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(user_id),
+        FOREIGN KEY (movie_id) REFERENCES movie(movie_id)
+    )
+`, (err) => {
+    if (err) {
+        console.error("Error al crear la tabla favoritos:", err.message);
+    } else {
+        console.log("Tabla favoritos creada o ya existe.");
+
+        // Crear índice para user_id en favoritos
+        db.run(`CREATE INDEX IF NOT EXISTS idx_favoritos_user_id ON favoritos(user_id)`, (err) => {
+            if (err) {
+                console.error("Error al crear el índice idx_favoritos_user_id:", err.message);
+            } else {
+                console.log("Índice idx_favoritos_user_id creado o ya existe.");
+            }
+        });
+    }
+});
 
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
-    res.render('index');
+    const username = req.session.user ? req.session.user.user_name : 'Visitante';
+    res.render('index', { username });
 });
+
+// ------------------------------------------------------
 
 // Ruta para buscar películas, directores y actores
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
     const tipoBusqueda = req.query.tipoBusqueda;
+
 
     const resultados = {
         searchTerm,
@@ -87,8 +131,13 @@ app.get('/buscar', (req, res) => {
 
 
 // Ruta para la página de datos de una película particular
-app.get('/pelicula/:id', (req, res) => {
-    const movieId = req.params.id;
+ app.get('/pelicula/:id', (req, res) => {
+     const movieId = req.params.id;
+
+     // Si no se proporciona un id, redirige a la página de inicio
+     if (!movieId) {
+         return res.redirect('/');
+     }
 
     // Consulta para obtener los datos de la película, elenco y crew ==> Lo necesario
     const query = `
@@ -151,7 +200,7 @@ app.get('/pelicula/:id', (req, res) => {
         } else {
             // Organizamos los datos en un objeto de película
             const movieData = {
-                id: rows[0].id,
+                id: movieId,
                 title: rows[0].title,
                 release_date: rows[0].release_date,
                 overview: rows[0].overview,
@@ -164,6 +213,7 @@ app.get('/pelicula/:id', (req, res) => {
                 keywords: [],
                 languages: [],
             };
+            console.log(movieData.id);
 
             // Creamos objeto para almacenar directores
             rows.forEach((row) => {
@@ -377,130 +427,6 @@ app.get('/director/:id', (req, res) => {
     });
 });
 
-// Configuración de body-parser
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-// Configuración de method-override
-app.use(methodOverride('_method'));
-
-
-
-// Crear un nuevo usuario
-app.post('/users', (req, res) => {
-    const { user_username, user_name, user_email } = req.body;
-    const query = `
-        INSERT INTO users (user_username, user_name, user_email)
-        VALUES (?, ?, ?);
-    `;
-    db.run(query, [user_username, user_name, user_email], function (err) {
-        if (err) {
-            res.status(500).send("Error al crear el usuario.");
-        } else {
-            res.status(201).send({ user_id: this.lastID });
-        }
-    });
-});
-
-// Modificar un usuario existente
-
-// Modificar un usuario existente
-app.post('/users/:id/edit', (req, res) => {
-    const { id } = req.params;
-    const { user_username, user_name, user_email } = req.body;
-
-    const query = `UPDATE users SET user_username = ?, user_name = ?, user_email = ? WHERE user_id = ?;`;
-    db.run(query, [user_username, user_name, user_email, id], function (err) {
-        if (err) {
-            console.error(err); // Mostrar el error en la consola para depuración
-            return res.status(500).send("Error al actualizar el usuario.");
-        } else {
-            // Redirigir con un mensaje
-            return res.redirect('/users?message=Usuario actualizado correctamente');
-        }
-    });
-});
-
-
-// Eliminar un usuario
-app.post('/users/:id/delete', (req, res) => {
-    const { id } = req.params;
-    const query = `DELETE FROM users WHERE user_id = ?;`;
-    db.run(query, [id], function (err) {
-        if (err) {
-            console.error(err); // Mostrar el error en la consola para depuración
-            return res.status(500).send("Error al eliminar el usuario.");
-        } else {
-            // Redirigir con un mensaje
-            return res.redirect('/users?message=Usuario eliminado correctamente');
-        }
-    });
-});
-
-
-
-// Listar todos los usuarios y sus películas con puntuación y opinión
-app.get('/users', (req, res) => {
-    const query = `
-        SELECT u.user_id, u.user_username, u.user_name, u.user_email,
-               m.title AS movie_title, mu.rating, mu.opinion
-        FROM users u
-                 LEFT JOIN movie_user mu ON u.user_id = mu.user_id
-                 LEFT JOIN movie m ON mu.movie_id = m.movie_id
-        ORDER BY u.user_id;
-    `;
-    db.all(query, (err, rows) => {
-        if (err) {
-            res.status(500).send("Error al listar los usuarios.");
-        } else {
-            // Estructura los datos en un formato adecuado
-            const users = rows.reduce((acc, row) => {
-                const user = acc[row.user_id] || {
-                    user_id: row.user_id,
-                    user_username: row.user_username,
-                    user_name: row.user_name,
-                    user_email: row.user_email,
-                    movies: []
-                };
-                if (row.movie_title) {
-                    user.movies.push({
-                        title: row.movie_title,
-                        rating: row.rating,
-                        opinion: row.opinion
-                    });
-                }
-                acc[row.user_id] = user;
-                return acc;
-            }, {});
-            // Renderizar la vista users.ejs con los datos de usuarios
-            res.render('users', { users: Object.values(users), message: req.query.message });
-        }
-    });
-});
-
-
-
-
-/// Asociar una película a un usuario con puntuación y opinión
-app.post('/users/:id/movies', (req, res) => {
-    const { id } = req.params;
-    const { movie_id, rating, opinion } = req.body;
-    const query = `
-        INSERT INTO movie_user (user_id, movie_id, rating, opinion)
-        VALUES (?, ?, ?, ?);
-    `;
-    db.run(query, [id, movie_id, rating, opinion], function (err) {
-        if (err) {
-            res.status(500).send("Error al asociar la película al usuario.");
-        } else {
-            res.status(201).send("Película asociada al usuario correctamente.");
-        }
-    });
-});
-
-
-
-
 // Ruta para mostrar el formulario de registro
 app.get('/register', (req, res) => {
     res.render('register', { message: null });
@@ -508,109 +434,42 @@ app.get('/register', (req, res) => {
 
 // Ruta para manejar el envío del formulario de registro
 app.post('/register', (req, res) => {
-    const { user_username, user_name, user_email } = req.body;
+    const { user_username, user_name, user_email, user_password } = req.body;
 
-    // SQL para insertar un nuevo usuario
-    const query = `
-        INSERT INTO users (user_username, user_name, user_email)
-        VALUES (?, ?, ?);
-    `;
-
-    db.run(query, [user_username, user_name, user_email], (err) => {
+    bcrypt.hash(user_password, 10, (err, hashedPassword) => {
         if (err) {
             console.error("Error al registrar el usuario:", err.message);
             res.render('register', { message: "Error al registrar el usuario. Inténtalo de nuevo." });
-        } else {
-            res.render('register', { message: "Usuario registrado con éxito." });
+            return;
         }
+
+        const query = `
+            INSERT INTO users (user_username, user_name, user_email, user_password)
+            VALUES (?, ?, ?, ?);
+        `;
+
+        db.run(query, [user_username, user_name, user_email, hashedPassword], (err) => {
+            if (err) {
+                console.error("Error al registrar el usuario:", err.message);
+                res.render('register', { message: "Error al registrar el usuario. Inténtalo de nuevo." });
+            } else {
+                res.render('register', { message: "Usuario registrado con éxito." });
+            }
+        });
     });
 });
-
-//-------------------
-//------------------------------AGREGOOOO
-
-
-// Ruta para agregar una película a la lista del usuario
-app.post('/agregar-pelicula', (req, res) => {
-    const { user_id, movie_id, rating, opinion } = req.body;
-
-    const insertQuery = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
-    db.run(insertQuery, [user_id, movie_id, rating, opinion], (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al agregar la película a la lista.');
-        }
-        res.redirect('/'); // Redirigir a la página principal o a donde desees
-    });
-});
-
-// Ruta para obtener las películas de un usuario
-app.get('/usuario/:id/peliculas', (req, res) => {
-    const userId = req.params.id;
-
-    const query = `
-        SELECT m.title, mu.rating, mu.opinion 
-        FROM movie_user mu
-        JOIN movie m ON mu.movie_id = m.movie_id
-        WHERE mu.user_id = ?;
-    `;
-
-    db.all(query, [userId], (err, rows) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al cargar las películas del usuario.');
-        }
-        res.render('peliculas_usuario', { userId, movies: rows });
-    });
-});
-
-
-
-//--------------------------
-//const express = require('express'); // Asegúrate de incluir esta línea
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-//const sqlite3 = require('sqlite3').verbose(); // Asegúrate de incluir sqlite3
-
-//const app = express(); // Inicializar la aplicación de Express
-
-// Middleware para analizar el cuerpo de las solicitudes
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Configuración de la sesión
-app.use(session({
-    secret: 'tu_secreto', // Cambia esto a un valor único y secreto
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Cambia a true si usas HTTPS
-}));
 
 // Ruta para mostrar el formulario de inicio de sesión
 app.get('/login', (req, res) => {
-    // Mostrar el mensaje de error si existe
-    const errorMessage = req.session.error ? req.session.error : '';
-    req.session.error = null; // Limpiar el mensaje de error después de mostrarlo
-
-    res.send(`
-        <form action="/login" method="POST">
-            <label for="user_username">Nombre de usuario:</label>
-            <input type="text" name="user_username" id="user_username" required>
-            <label for="user_password">Contraseña:</label>
-            <input type="password" name="user_password" id="user_password" required>
-            <button type="submit">Iniciar sesión</button>
-            <div style="color: red;">${errorMessage}</div> <!-- Mostrar el mensaje de error aquí -->
-        </form>
-    `);
+    const errorMessage = req.session.error || '';
+    req.session.error = null;
+    res.render('login', { errorMessage });
 });
 
 // Ruta para manejar el inicio de sesión
 app.post('/login', (req, res) => {
     const username = req.body.user_username;
     const password = req.body.user_password;
-
-    // Conexión a la base de datos
-    const db = new sqlite3.Database('./movies.db');
 
     db.get('SELECT * FROM users WHERE user_username = ?', [username], (err, user) => {
         if (err) {
@@ -628,9 +487,10 @@ app.post('/login', (req, res) => {
                 }
 
                 if (isMatch) {
-                    req.session.userId = user.user_id;
-                    req.session.userName = user.user_name; // Almacenar el nombre para mostrar después
-                    return res.redirect('/'); // Redirige a la página principal
+                    req.session.user = user;
+                    console.log('its a match')
+                    req.session.santi = username;
+                    return res.redirect('/'); // Redirige a la página principal después de iniciar sesión
                 } else {
                     req.session.error = 'Contraseña incorrecta.';
                     return res.redirect('/login');
@@ -643,18 +503,8 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Ruta para mostrar la página principal
-app.get('/', (req, res) => {
-    const username = req.session.userName; // Obtener el nombre de usuario de la sesión
-    res.send(`
-        <h1>Hola, ${username ? username : 'Visitante'}!</h1>
-        <a href="/login">Iniciar sesión</a>
-        <a href="/logout">Cerrar sesión</a>
-    `);
-});
-
 // Ruta para manejar el cierre de sesión
-app.get('/logout', (req, res) => {
+app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error(err);
@@ -664,10 +514,89 @@ app.get('/logout', (req, res) => {
     });
 });
 
+// Ruta para listar usuarios
+app.get('/users', (req, res) => {
+    const query = `SELECT * FROM users;`;
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err.message);
+            return res.status(500).send("Error al obtener usuarios.");
+        }
+        res.render('users', { users: users, message: null });
+    });
+});
+
+// Ruta para agregar película a favoritos
+app.post('/agregar-pelicula', (req, res) => {
+    const { movieId, rating, opinion } = req.body;  // Asegúrate de que movieId está en req.body
+    const userId = req.session.user ? req.session.user.user_id : null;
+
+
+    if (!userId) {
+        req.session.error = 'Debe iniciar sesión para agregar una película a favoritos.';
+        return res.redirect('/login');
+    }
+
+    if (!movieId || !rating) {
+        req.session.error = 'Faltan datos necesarios para agregar la película a favoritos.';
+        return res.redirect(`/pelicula/${movieId}`); // Si falta algún dato, regresa a la página de la película
+    }
+
+    // Verificar si la película existe
+    const verificarPeliculaQuery = `SELECT * FROM movie WHERE movie_id = ?`;
+    db.get(verificarPeliculaQuery, [movieId], (err, movie) => {
+        if (err) {
+            console.error("Error al verificar la existencia de la película:", err.message);
+            return res.status(500).send("Error al verificar la existencia de la película.");
+        }
+
+        if (!movie) {
+            req.session.error = 'Película no encontrada en la base de datos.';
+            return res.redirect(`/pelicula/${movieId}`);
+        }
+
+        // Si la película existe, insertarla en favoritos
+        const agregarFavoritoQuery = `
+            INSERT INTO favoritos (user_id, movie_id, rating, opinion)
+            VALUES (?, ?, ?, ?);
+        `;
+
+        db.run(agregarFavoritoQuery, [userId, movieId, rating, opinion], (err) => {
+            if (err) {
+                console.error("Error al agregar la película a favoritos:", err.message);
+                req.session.error = 'Error al agregar la película a favoritos.';
+                return res.redirect(`/pelicula/${movieId}`);
+            }
+
+            req.session.success = 'Película agregada a la lista de favoritos con éxito.';
+            res.redirect(`/`);
+        });
+    });
+});
+
+app.get('/usuario/:userId/peliculas', (req, res) => {
+const userId = req.params.userId;
+
+const query = `
+        SELECT movie.title, favoritos.rating, favoritos.opinion
+        FROM favoritos
+        JOIN movie ON favoritos.movie_id = movie.movie_id
+        WHERE favoritos.user_id = ?;
+    `;
+
+db.all(query, [userId], (err, movies) => {
+    if (err) {
+        console.error('Error al obtener las películas favoritas:', err);
+        return res.status(500).send('Error al obtener las películas favoritas.');
+    }
+
+    res.render('favoritos', { movies });
+});
+});
 
 
 
-//---------------------
 
 // Iniciar el servidor
 app.listen(port, () => {
