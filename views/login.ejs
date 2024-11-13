@@ -18,30 +18,40 @@
 
         form {
             background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
             text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 24px;
         }
 
         input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border: none;
             border-radius: 5px;
+            font-size: 16px;
             outline: none;
         }
 
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
             border-radius: 5px;
             background-color: #007bff;
             color: white;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         button:hover {
@@ -49,8 +59,9 @@
         }
 
         .error-message {
-            color: red;
+            color: #ff4c4c;
             margin-top: 10px;
+            font-size: 0.9em;
         }
 
         .register-button {
@@ -62,6 +73,7 @@
             text-decoration: none;
             border-radius: 5px;
             font-size: 16px;
+            transition: background-color 0.3s;
         }
 
         .register-button:hover {
@@ -70,18 +82,20 @@
     </style>
 </head>
 <body>
-<form action="/login" method="POST">
-    <h2>Iniciar Sesión</h2>
-    <input type="text" name="user_username" placeholder="Usuario" required>
-    <input type="password" name="user_password" placeholder="Contraseña" required>
-    <button type="submit">Iniciar Sesión</button>
+    <form action="/login" method="POST">
+        <h2>Iniciar Sesión</h2>
+        <input type="text" name="user_username" placeholder="Usuario" required>
+        <input type="password" name="user_password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar Sesión</button>
 
-    <% if (errorMessage) { %>
-        <div class="error-message"><%= errorMessage %></div>
-        <% if (showRegisterButton) { %>
+        <% if (errorMessage) { %>
+            <div class="error-message"><%= errorMessage %></div>
+        <% } %>
+
+        <!-- Mostrar el botón de registro si está disponible -->
+        <% if (typeof showRegisterButton !== 'undefined' && showRegisterButton) { %>
             <a href="/register" class="register-button">Registrarse</a>
         <% } %>
-    <% } %>
-</form>
+    </form>
 </body>
 </html>

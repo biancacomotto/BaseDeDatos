@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas Calificadas de <%= username %></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Películas Calificadas de <%= username %></h1>
+
+    <% if (calificadas && calificadas.length > 0) { %>
+        <ul class="list-group">
+            <% calificadas.forEach(movie => { %>
+                <li class="list-group-item">
+                    <strong>Título:</strong> <%= movie.title %><br>
+                    <strong>Calificación:</strong> <%= movie.rating %>/5<br>
+                    <strong>Opinión:</strong> <%= movie.opinion %>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>No hay películas calificadas para este usuario.</p>
+    <% } %>
+
+    <div class="mt-4">
+        <a href="/users" class="btn btn-primary">Volver a Usuarios</a>
+        <a href="/" class="btn btn-secondary ml-2">Volver al Inicio</a>
+    </div>
+</div>
+
+</body>
+</html>

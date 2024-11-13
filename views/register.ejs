@@ -23,7 +23,7 @@
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             padding: 30px;
             border-radius: 10px;
             width: 100%;
@@ -72,7 +72,7 @@
             background-color: #4e54c8;
         }
 
-        /* Mensaje de éxito */
+        /* Mensaje de éxito y error */
         .message {
             text-align: center;
             margin-top: 10px;
@@ -82,6 +82,21 @@
 
         .error {
             color: #dc3545;
+        }
+
+        /* Enlace a Iniciar Sesión */
+        .login-link {
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+            color: #8f94fb;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: #4e54c8;
         }
 
         /* Botón de volver al inicio */
@@ -101,31 +116,35 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Registro de Usuario</h1>
-    <form action="/register" method="POST">
-        <label for="user_username">Nombre de usuario:</label>
-        <input type="text" name="user_username" id="user_username" required>
+    <div class="container">
+        <h1>Registro de Usuario</h1>
 
-        <label for="user_name">Nombre completo:</label>
-        <input type="text" name="user_name" id="user_name" required>
+        <form action="/register" method="POST">
+            <label for="user_username">Nombre de usuario:</label>
+            <input type="text" name="user_username" id="user_username" required>
 
-        <label for="user_email">Email:</label>
-        <input type="email" name="user_email" id="user_email" required>
+            <label for="user_name">Nombre completo:</label>
+            <input type="text" name="user_name" id="user_name" required>
 
-        <label for="user_password">Contraseña:</label>
-        <input type="password" name="user_password" id="user_password" required>
+            <label for="user_email">Email:</label>
+            <input type="email" name="user_email" id="user_email" required>
 
-        <button type="submit">Registrar</button>
-    </form>
+            <label for="user_password">Contraseña:</label>
+            <input type="password" name="user_password" id="user_password" required>
 
-    <!-- Muestra el mensaje de éxito o error, si existe -->
-    <% if (message) { %>
-        <p class="message"><%= message %></p>
-    <% } %>
+            <button type="submit">Registrar</button>
+        </form>
 
-    <!-- Botón para volver al inicio -->
-    <a href="/" class="back-button">Volver al inicio</a>
-</div>
+        <!-- Mensaje de éxito o error, si existe -->
+        <% if (message) { %>
+            <p class="message"><%= message %></p>
+        <% } %>
+
+        <!-- Enlace a Iniciar Sesión -->
+        <a href="/login" class="login-link">¿Ya tienes una cuenta? Inicia Sesión</a>
+
+        <!-- Botón para volver al inicio -->
+        <a href="/" class="back-button">Volver al inicio</a>
+    </div>
 </body>
 </html>

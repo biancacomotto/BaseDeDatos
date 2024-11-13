@@ -8,64 +8,66 @@
 </head>
 <body>
 
-<div class="container">
-    <h1>Lista de Usuarios</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">Lista de Usuarios</h1>
 
+    <!-- Mensaje de éxito o error, si está disponible -->
     <% if (message) { %>
         <div class="alert alert-success">
             <%= message %>
+        </div>
+    <% } %>
+    <% if (errorMessage) { %>
+        <div class="alert alert-danger">
+            <%= errorMessage %>
         </div>
     <% } %>
 
     <div id="usuarios">
         <% if (users && users.length > 0) { %>
             <% users.forEach(user => { %>
-                <div class="usuario">
+                <div class="usuario p-3 mb-4 border rounded">
                     <h2><%= user.user_name %> (<%= user.user_username %>)</h2>
-                    <p>Email: <%= user.user_email %></p>
+                    <p><strong>Email:</strong> <%= user.user_email %></p>
 
-                    <% if (user.movies && user.movies.length > 0) { %>
-                        <h3>Películas que le gustan:</h3>
-                        <ul>
-                            <% user.movies.forEach(movie => { %>
-                                <li>
-                                    <strong>Título:</strong> <%= movie.title %> <br>
-                                    <strong>Puntuación:</strong> <%= movie.rating ? movie.rating : 'No calificado' %> <br>
-                                    <strong>Opinión:</strong> <%= movie.opinion ? movie.opinion : 'Sin opinión' %>
-                                </li>
-                            <% }) %>
-                        </ul>
+                    <!-- Sección de Películas Calificadas y Favoritas -->
+                    <div class="mb-2">
+                        <a href="/usuario/<%= user.user_id %>/peliculas-calificadas" class="btn btn-outline-primary btn-sm">Películas Calificadas</a>
+                        <a href="/usuario/<%= user.user_id %>/peliculas-favoritas" class="btn btn-outline-secondary btn-sm">Películas Favoritas</a>
+                    </div>
+
+                    <!-- Mostrar botones de Modificar y Eliminar solo para administradores -->
+                    <% if (currentUserRole === 'admin') { %>
+                        <div class="user-actions">
+                            <button onclick="showEditForm(<%= user.user_id %>)" class="btn btn-warning btn-sm">Modificar</button>
+                            <form action="/users/<%= user.user_id %>/delete" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </div>
                     <% } else { %>
-                        <p>Este usuario no tiene películas favoritas registradas.</p>
+                        <p class="text-danger">No tienes permisos para editar o eliminar usuarios.</p>
                     <% } %>
 
-                    <!-- Botón para modificar información del usuario -->
-                    <button onclick="showEditForm(<%= user.user_id %>)">Modificar</button>
-
-                    <!-- Formulario para eliminar usuario -->
-                    <form action="/users/<%= user.user_id %>/delete" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');" style="display:inline;">
-                        <button type="submit">Eliminar</button>
-                    </form>
-
-                    <!-- Botón para ver películas de este usuario -->
-                    <a href="/usuario/<%= user.user_id %>/peliculas" class="btn btn-link">Ver películas de este usuario</a>
-
-
-                    <!-- Formulario de edición que se muestra/oculta con JavaScript -->
-                    <div id="editForm-<%= user.user_id %>" style="display:none;">
-                        <h3>Editar usuario</h3>
+                    <!-- Formulario de Edición (oculto por defecto) -->
+                    <div id="editForm-<%= user.user_id %>" class="mt-3" style="display:none;">
+                        <h3>Editar Usuario</h3>
                         <form action="/users/<%= user.user_id %>/edit" method="POST">
-                            <label for="username">Username:</label>
-                            <input type="text" name="user_username" value="<%= user.user_username %>" required>
-                            <label for="name">Nombre:</label>
-                            <input type="text" name="user_name" value="<%= user.user_name %>" required>
-                            <label for="email">Email:</label>
-                            <input type="email" name="user_email" value="<%= user.user_email %>" required>
-                            <button type="submit">Guardar cambios</button>
+                            <div class="form-group">
+                                <label for="username-<%= user.user_id %>">Username:</label>
+                                <input type="text" id="username-<%= user.user_id %>" name="user_username" value="<%= user.user_username %>" required class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="name-<%= user.user_id %>">Nombre:</label>
+                                <input type="text" id="name-<%= user.user_id %>" name="user_name" value="<%= user.user_name %>" required class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="email-<%= user.user_id %>">Email:</label>
+                                <input type="email" id="email-<%= user.user_id %>" name="user_email" value="<%= user.user_email %>" required class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar cambios</button>
                         </form>
                     </div>
                 </div>
-                <hr> <!-- Línea horizontal para separar usuarios -->
             <% }) %>
         <% } else { %>
             <p>No hay usuarios registrados.</p>
@@ -73,7 +75,7 @@
     </div>
 
     <!-- Botón para volver al inicio -->
-    <a href="/" class="btn btn-primary">Volver al Inicio</a>
+    <a href="/" class="btn btn-primary mt-4">Volver al Inicio</a>
 
     <script>
         function showEditForm(userId) {
