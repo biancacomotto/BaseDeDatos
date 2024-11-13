@@ -21,6 +21,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
 
         input[type="text"], input[type="password"] {
@@ -50,20 +51,37 @@
         .error-message {
             color: red;
             margin-top: 10px;
-            text-align: center;
+        }
+
+        .register-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .register-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-<form action="/login" method="POST">
-    <h2>Iniciar Sesión</h2>
-    <input type="text" name="user_username" placeholder="Usuario" required>
-    <input type="password" name="user_password" placeholder="Contraseña" required>
-    <button type="submit">Iniciar Sesión</button>
-</form>
+    <form action="/login" method="POST">
+        <h2>Iniciar Sesión</h2>
+        <input type="text" name="user_username" placeholder="Usuario" required>
+        <input type="password" name="user_password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar Sesión</button>
 
-<% if (errorMessage) { %>
-    <div class="error-message"><%= errorMessage %></div>
-<% } %>
+        <% if (errorMessage) { %>
+            <div class="error-message"><%= errorMessage %></div>
+            <% if (showRegisterButton) { %>
+                <a href="/register" class="register-button">Registrarse</a>
+            <% } %>
+        <% } %>
+    </form>
 </body>
 </html>

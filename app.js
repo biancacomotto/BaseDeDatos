@@ -62,12 +62,6 @@ db.run(`
     }
 });
 
-// Ruta para la página de inicio
-app.get('/', (req, res) => {
-    const username = req.session.user ? req.session.user.user_name : 'Visitante';
-    res.render('index', { username });
-});
-
 // ------------------------------------------------------
 
 // Ruta para buscar películas, directores y actores
@@ -459,12 +453,14 @@ app.post('/register', (req, res) => {
     });
 });
 
+
 // Ruta para mostrar el formulario de inicio de sesión
 app.get('/login', (req, res) => {
     const errorMessage = req.session.error || '';
     req.session.error = null;
     res.render('login', { errorMessage });
 });
+
 
 // Ruta para manejar el inicio de sesión
 app.post('/login', (req, res) => {
@@ -488,17 +484,16 @@ app.post('/login', (req, res) => {
 
                 if (isMatch) {
                     req.session.user = user;
-                    console.log('its a match')
-                    req.session.santi = username;
+                    console.log('Inicio de sesión exitoso');
                     return res.redirect('/'); // Redirige a la página principal después de iniciar sesión
                 } else {
-                    req.session.error = 'Contraseña incorrecta.';
-                    return res.redirect('/login');
+                    // Contraseña incorrecta
+                    return res.render('login', { errorMessage: 'Contraseña incorrecta.', showRegisterButton: false });
                 }
             });
         } else {
-            req.session.error = 'Nombre de usuario no encontrado.';
-            return res.redirect('/login');
+            // Usuario no encontrado
+            return res.render('login', { errorMessage: 'Usuario no existente.', showRegisterButton: true });
         }
     });
 });
@@ -595,6 +590,40 @@ db.all(query, [userId], (err, movies) => {
 });
 });
 
+// Ruta para mostrar la página principal
+app.get('/', (req, res) => {
+    const isLoggedIn = !!req.session.user; // Verifica si el usuario está logeado
+    const username = isLoggedIn ? req.session.user.user_name : 'Visitante';
+
+    res.render('index', {
+        isLoggedIn,
+        username
+    });
+});
+
+// Ruta para el perfil
+app.get('/profile', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const userId = req.session.user.user_id;
+    const query = `
+        SELECT movie.title, favoritos.rating, favoritos.opinion
+        FROM favoritos
+        JOIN movie ON favoritos.movie_id = movie.movie_id
+        WHERE favoritos.user_id = ?;
+    `;
+
+    db.all(query, [userId], (err, movies) => {
+        if (err) {
+            console.error('Error al obtener las películas favoritas:', err);
+            return res.status(500).send('Error al obtener las películas favoritas.');
+        }
+
+        res.render('profile', { username: req.session.user.user_name, movies });
+    });
+});
 
 
 
