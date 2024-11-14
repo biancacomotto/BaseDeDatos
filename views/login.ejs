@@ -4,98 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - MovieWeb</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* Estilos básicos de reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: #005b96;
-            color: white;
+            background-color: #121212; /* Fondo oscuro */
+            color: #fff;
         }
 
-        form {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 25px;
+        .container {
+            background: #1e1e1e;
+            padding: 40px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
             text-align: center;
-            max-width: 350px;
-            width: 100%;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.3s ease;
         }
 
-        h2 {
-            color: #ffffff;
+        h1:hover {
+            font-size: 32px;
+            color: #f1c40f; /* Amarillo */
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin: 10px 0 5px;
+            color: #bbb;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
             margin-bottom: 15px;
-            font-size: 24px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #222;
+            color: #fff;
+            font-size: 14px;
         }
 
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
+        input[type="text"]:focus,
+        input[type="password"]:focus {
             outline: none;
+            border-color: #f1c40f;
         }
 
-        button {
+        button[type="submit"] {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
+            background-color: #f1c40f; /* Amarillo */
             border: none;
             border-radius: 5px;
-            background-color: #007bff;
-            color: white;
             font-size: 16px;
+            font-weight: 600;
+            color: #121212;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        button[type="submit"]:hover {
+            background-color: #fff;
+            color: #121212;
+            transform: scale(1.05);
         }
 
+        /* Mensaje de error */
         .error-message {
-            color: #ff4c4c;
+            text-align: center;
             margin-top: 10px;
-            font-size: 0.9em;
-        }
-
-        .register-button {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
             font-size: 16px;
-            transition: background-color 0.3s;
+            color: #dc3545;
         }
 
-        .register-button:hover {
-            background-color: #218838;
+        /* Enlace a registro */
+        .register-link {
+            text-align: center;
+            display: block;
+            margin-top: 15px;
+            color: #f1c40f; /* Amarillo */
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .register-link:hover {
+            color: #fff;
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <h1>Iniciar Sesión</h1>
+
     <form action="/login" method="POST">
-        <h2>Iniciar Sesión</h2>
-        <input type="text" name="user_username" placeholder="Usuario" required>
-        <input type="password" name="user_password" placeholder="Contraseña" required>
+        <label for="user_username">Nombre de usuario:</label>
+        <input type="text" name="user_username" id="user_username" required>
+
+        <label for="user_password">Contraseña:</label>
+        <input type="password" name="user_password" id="user_password" required>
+
         <button type="submit">Iniciar Sesión</button>
-
-        <% if (errorMessage) { %>
-            <div class="error-message"><%= errorMessage %></div>
-        <% } %>
-
-        <!-- Mostrar el botón de registro si está disponible -->
-        <% if (typeof showRegisterButton !== 'undefined' && showRegisterButton) { %>
-            <a href="/register" class="register-button">Registrarse</a>
-        <% } %>
     </form>
+
+    <% if (errorMessage) { %>
+        <div class="error-message"><%= errorMessage %></div>
+    <% } %>
+
+    <a href="/register" class="register-link">¿No tienes cuenta? Regístrate aquí</a>
+</div>
 </body>
 </html>

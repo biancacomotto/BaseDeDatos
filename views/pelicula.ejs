@@ -5,36 +5,44 @@
     <title><%= movie.title %> - Detalles</title>
     <link rel="stylesheet" href="/styles.css">
     <style>
+        /* Aplica la fuente Poppins a todo */
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #1a1a1a; /* Fondo oscuro */
+            color: #ffffff; /* Texto principal en blanco */
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
         }
 
         h1 {
-            color: #333;
-            font-size: 2rem;
+            color: #ffdd57; /* Tono amarillo */
+            font-size: 2.5rem;
+            margin-bottom: 10px;
         }
 
         h3 {
-            color: #666;
+            color: #cccccc;
             font-size: 1.2rem;
         }
 
         .info-box {
             margin-top: 20px;
-            background-color: #fff;
-            padding: 15px;
+            background-color: #2a2a2a; /* Caja oscura */
+            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .info-box-title {
             font-size: 1.5rem;
-            color: #007bff;
+            color: #ffdd57; /* Tono amarillo */
             margin-bottom: 10px;
             font-weight: bold;
         }
@@ -47,36 +55,50 @@
             font-size: 1rem;
             display: block;
             margin-top: 10px;
-            width: 100%;
-            box-sizing: border-box;
+            color: #cccccc;
         }
 
         input[type="number"],
         textarea {
+            background-color: #333333;
+            color: #ffffff;
             padding: 10px;
             margin-top: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #555555;
             border-radius: 4px;
         }
 
         button {
-            background-color: #007bff;
-            color: white;
+            background-color: #ffdd57;
+            color: #1a1a1a;
             padding: 10px 15px;
             margin-top: 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
+            transition: background-color 0.3s;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #e6c847; /* Color amarillo oscuro */
         }
 
         .action-buttons {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .success-message {
+            background-color: #2a2a2a;
+            color: #ffdd57;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
         }
 
         #inicio {
@@ -85,166 +107,165 @@
         }
 
         #inicio a {
-            color: #007bff;
+            color: #ffdd57;
             text-decoration: none;
             font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        #inicio a:hover {
+            color: #e6c847;
+        }
+
+        .info-box-content a {
+            color: #ffdd57;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .info-box-content a:hover {
+            color: #e6c847;
         }
     </style>
 </head>
 <body>
-    <h1><%= movie.title %></h1>
-    <h3>Fecha de lanzamiento: <%= movie.release_date %></h3>
+<h1><%= movie.title %></h1>
+<h3>Fecha de lanzamiento: <%= movie.release_date %></h3>
 
-      <!-- Mostrar mensaje de éxito si está disponible -->
-        <% if (successMessage) { %>
-            <div class="success-message"><%= successMessage %></div>
+<% if (successMessage) { %>
+    <div class="success-message"><%= successMessage %></div>
+<% } %>
+
+<div class="action-buttons">
+    <form action="/agregar-calificada" method="POST">
+        <input type="hidden" name="movieId" value="<%= movie.id %>">
+        <label for="rating">Calificación:</label>
+        <input type="number" name="rating" min="1" max="5" required>
+        <label for="opinion">Opinión:</label>
+        <textarea name="opinion" required></textarea>
+        <button type="submit">Agregar a Películas Calificadas</button>
+    </form>
+
+    <form action="/agregar-favorito" method="POST">
+        <input type="hidden" name="movieId" value="<%= movie.id %>">
+        <button type="submit">❤ Agregar a Favoritos</button>
+    </form>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Dirigida por</div>
+    <div class="info-box-content">
+        <ul>
+            <% movie.directors.forEach((director) => { %>
+                <li><a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a></li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Escrita por</div>
+    <div class="info-box-content">
+        <ul>
+            <% movie.writers.forEach((writer) => { %>
+                <li><%= writer.crew_member_name %></li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Argumento</div>
+    <p><%= movie.overview %></p>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Elenco</div>
+    <ul>
+        <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
+            <li><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
+        <% }); %>
+    </ul>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Crew</div>
+    <ul>
+        <% movie.crew.forEach((crewMember) => { %>
+            <li><%= crewMember.crew_member_name %> - <%= crewMember.department_name %> (<%= crewMember.job %>)</li>
+        <% }); %>
+    </ul>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Palabras Clave</div>
+    <ul>
+        <% if (movie.keywords && movie.keywords.length) { %>
+            <% movie.keywords.forEach(keyword => { %>
+                <li><%= keyword %></li>
+            <% }); %>
+        <% } else { %>
+            <li>No hay palabras clave disponibles.</li>
         <% } %>
+    </ul>
+</div>
 
-    <!-- Formulario para agregar película a películas calificadas y favoritos -->
-    <div class="action-buttons">
-       <form action="/agregar-calificada" method="POST">
-           <input type="hidden" name="movieId" value="<%= movie.id %>">
-           <label for="rating">Calificación:</label>
-           <input type="number" name="rating" min="1" max="5" required>
-           <label for="opinion">Opinión:</label>
-           <textarea name="opinion" required></textarea>
-           <button type="submit">Agregar a Películas Calificadas</button>
-       </form>
-
-       <form action="/agregar-favorito" method="POST" style="margin-top: 10px;">
-           <input type="hidden" name="movieId" value="<%= movie.id %>">
-           <button type="submit" style="background: none; border: none; cursor: pointer;">
-               ❤️ Agregar a Favoritos
-           </button>
-       </form>
-    </div>
-
-    <!-- Secciones de información detallada -->
-    <!-- Dirigida por -->
-    <div class="info-box">
-        <div class="info-box-title">Dirigida por</div>
-        <div class="info-box-content">
-            <ul>
-                <% movie.directors.forEach((director) => { %>
-                    <li><a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a></li>
-                <% }); %>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Escrita por -->
-    <div class="info-box">
-        <div class="info-box-title">Escrita por</div>
-        <div class="info-box-content">
-            <ul>
-                <% movie.writers.forEach((writer) => { %>
-                    <li><%= writer.crew_member_name %></li>
-                <% }); %>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Argumento -->
-    <div class="info-box">
-        <div class="info-box-title">Argumento</div>
-        <p><%= movie.overview %></p>
-    </div>
-
-    <!-- Elenco -->
-    <div class="info-box">
-        <div class="info-box-title">Elenco</div>
-        <ul>
-            <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
-                <li><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
+<div class="info-box">
+    <div class="info-box-title">Idiomas</div>
+    <ul>
+        <% if (movie.languages && movie.languages.length) { %>
+            <% movie.languages.forEach(language => { %>
+                <li><%= language %></li>
             <% }); %>
-        </ul>
-    </div>
+        <% } else { %>
+            <li>No hay idiomas disponibles.</li>
+        <% } %>
+    </ul>
+</div>
 
-    <!-- Crew -->
-    <div class="info-box">
-        <div class="info-box-title">Crew</div>
-        <ul>
-            <% movie.crew.forEach((crewMember) => { %>
-                <li><%= crewMember.crew_member_name %> - <%= crewMember.department_name %> (<%= crewMember.job %>)</li>
+<div class="info-box">
+    <div class="info-box-title">Géneros</div>
+    <ul>
+        <% if (movie.genres && movie.genres.length) { %>
+            <% movie.genres.forEach(genre => { %>
+                <li><%= genre %></li>
             <% }); %>
-        </ul>
-    </div>
+        <% } else { %>
+            <li>No hay géneros disponibles.</li>
+        <% } %>
+    </ul>
+</div>
 
-    <!-- Palabras clave (Keywords) -->
-    <div class="info-box">
-        <div class="info-box-title">Palabras Clave</div>
-        <ul>
-            <% if (movie.keywords && movie.keywords.length) { %>
-                <% movie.keywords.forEach(keyword => { %>
-                    <li><%= keyword %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay palabras clave disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
+<div class="info-box">
+    <div class="info-box-title">Países de Producción</div>
+    <ul>
+        <% if (movie.companies && movie.companies.length) { %>
+            <%
+                const uniqueCountries = new Set();
+                movie.companies.forEach(company => uniqueCountries.add(company.country_name));
+            uniqueCountries.forEach(country => { %>
+                <li><%= country %></li>
+            <% });
+            %>
+        <% } else { %>
+            <li>No hay países de producción disponibles.</li>
+        <% } %>
+    </ul>
+</div>
 
-    <!-- Idiomas -->
-    <div class="info-box">
-        <div class="info-box-title">Idiomas</div>
-        <ul>
-            <% if (movie.languages && movie.languages.length) { %>
-                <% movie.languages.forEach(language => { %>
-                    <li><%= language %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay idiomas disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
+<div class="info-box">
+    <div class="info-box-title">Empresas de Producción</div>
+    <ul>
+        <% if (movie.companies && movie.companies.length) { %>
+            <% movie.companies.forEach(company => { %>
+                <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
+            <% }); %>
+        <% } else { %>
+            <li>No hay empresas de producción disponibles.</li>
+        <% } %>
+    </ul>
+</div>
 
-    <!-- Géneros -->
-    <div class="info-box">
-        <div class="info-box-title">Géneros</div>
-        <ul>
-            <% if (movie.genres && movie.genres.length) { %>
-                <% movie.genres.forEach(genre => { %>
-                    <li><%= genre %></li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay géneros disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-
-    <!-- Países de Producción -->
-    <div class="info-box">
-        <div class="info-box-title">Países de Producción</div>
-        <ul>
-            <% if (movie.companies && movie.companies.length) { %>
-                <%
-                    const uniqueCountries = new Set();
-                    movie.companies.forEach(company => uniqueCountries.add(company.country_name));
-                    uniqueCountries.forEach(country => { %>
-                        <li><%= country %></li>
-                    <% });
-                %>
-            <% } else { %>
-                <li>No hay países de producción disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-
-    <!-- Empresas de Producción -->
-    <div class="info-box">
-        <div class="info-box-title">Empresas de Producción</div>
-        <ul>
-            <% if (movie.companies && movie.companies.length) { %>
-                <% movie.companies.forEach(company => { %>
-                    <li><%= company.company_name %> (País: <%= company.country_name %>)</li>
-                <% }); %>
-            <% } else { %>
-                <li>No hay empresas de producción disponibles.</li>
-            <% } %>
-        </ul>
-    </div>
-
-    <!-- Botón para volver al inicio -->
-    <div id="inicio"><a href="/">Inicio</a></div>
+<div id="inicio"><a href="/">Inicio</a></div>
 </body>
 </html>

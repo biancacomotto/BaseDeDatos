@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Películas Calificadas de <%= username %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -15,7 +14,8 @@
         <ul class="list-group">
             <% calificadas.forEach(movie => { %>
                 <li class="list-group-item">
-                    <strong>Título:</strong> <%= movie.title %><br>
+                    <strong>Título:</strong>
+                    <a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a><br>
                     <strong>Calificación:</strong> <%= movie.rating %>/5<br>
                     <strong>Opinión:</strong> <%= movie.opinion %>
                 </li>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuario - MovieWeb</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         /* Estilos básicos de reset */
         * {
@@ -17,59 +18,78 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
             color: #fff;
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.75);
-            padding: 30px;
+            background: #1e1e1e;
+            padding: 40px;
             border-radius: 10px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
             text-align: center;
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        h1:hover {
+            font-size: 32px;
+            color: #f1c40f; /* Amarillo */
         }
 
         label {
             display: block;
             font-size: 14px;
             margin: 10px 0 5px;
+            color: #bbb;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
             border-radius: 5px;
-            border: none;
-            outline: none;
+            border: 1px solid #333;
+            background-color: #222;
+            color: #fff;
             font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #f1c40f;
         }
 
         button[type="submit"] {
             width: 100%;
-            padding: 12px;
-            background-color: #8f94fb;
+            padding: 14px;
+            background-color: #f1c40f; /* Amarillo */
             border: none;
             border-radius: 5px;
             font-size: 16px;
-            font-weight: bold;
-            color: #fff;
+            font-weight: 600;
+            color: #121212;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         button[type="submit"]:hover {
-            background-color: #4e54c8;
+            background-color: #fff;
+            color: #121212;
+            transform: scale(1.05);
         }
 
         /* Mensaje de éxito y error */
@@ -88,15 +108,15 @@
         .login-link {
             text-align: center;
             display: block;
-            margin-top: 10px;
-            color: #8f94fb;
+            margin-top: 15px;
+            color: #f1c40f; /* Amarillo */
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
             transition: color 0.3s ease;
         }
 
         .login-link:hover {
-            color: #4e54c8;
+            color: #fff;
         }
 
         /* Botón de volver al inicio */
@@ -104,47 +124,47 @@
             display: block;
             text-align: center;
             margin-top: 20px;
-            color: #8f94fb;
+            color: #f1c40f; /* Amarillo */
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
             transition: color 0.3s ease;
         }
 
         .back-button:hover {
-            color: #4e54c8;
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Registro de Usuario</h1>
+<div class="container">
+    <h1>Registro de Usuario</h1>
 
-        <form action="/register" method="POST">
-            <label for="user_username">Nombre de usuario:</label>
-            <input type="text" name="user_username" id="user_username" required>
+    <form action="/register" method="POST">
+        <label for="user_username">Nombre de usuario:</label>
+        <input type="text" name="user_username" id="user_username" required>
 
-            <label for="user_name">Nombre completo:</label>
-            <input type="text" name="user_name" id="user_name" required>
+        <label for="user_name">Nombre completo:</label>
+        <input type="text" name="user_name" id="user_name" required>
 
-            <label for="user_email">Email:</label>
-            <input type="email" name="user_email" id="user_email" required>
+        <label for="user_email">Email:</label>
+        <input type="email" name="user_email" id="user_email" required>
 
-            <label for="user_password">Contraseña:</label>
-            <input type="password" name="user_password" id="user_password" required>
+        <label for="user_password">Contraseña:</label>
+        <input type="password" name="user_password" id="user_password" required>
 
-            <button type="submit">Registrar</button>
-        </form>
+        <button type="submit">Registrar</button>
+    </form>
 
-        <!-- Mensaje de éxito o error, si existe -->
-        <% if (message) { %>
-            <p class="message"><%= message %></p>
-        <% } %>
+    <!-- Mensaje de éxito o error, si existe -->
+    <% if (message) { %>
+        <p class="message"><%= message %></p>
+    <% } %>
 
-        <!-- Enlace a Iniciar Sesión -->
-        <a href="/login" class="login-link">¿Ya tienes una cuenta? Inicia Sesión</a>
+    <!-- Enlace a Iniciar Sesión -->
+    <a href="/login" class="login-link">¿Ya tienes una cuenta? Inicia Sesión</a>
 
-        <!-- Botón para volver al inicio -->
-        <a href="/" class="back-button">Volver al inicio</a>
-    </div>
+    <!-- Botón para volver al inicio -->
+    <a href="/" class="back-button">Volver al inicio</a>
+</div>
 </body>
 </html>

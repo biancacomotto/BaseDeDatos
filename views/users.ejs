@@ -4,7 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Estilos básicos de reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #fff;
+        }
+
+        .container {
+            background: #1e1e1e;
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #f1c40f; /* Borde amarillo */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        h1:hover {
+            font-size: 32px;
+            color: #f1c40f; /* Amarillo */
+        }
+
+        .alert {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .usuario {
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #f1c40f; /* Borde amarillo */
+        }
+
+        .usuario h2 {
+            font-size: 22px;
+            color: #f1c40f; /* Amarillo */
+        }
+
+        .usuario p {
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        .btn-outline-primary,
+        .btn-outline-secondary {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            border-color: #444;
+        }
+
+        .btn-outline-primary:hover,
+        .btn-outline-secondary:hover {
+            background-color: #f1c40f;
+            color: #121212;
+        }
+
+        .user-actions button {
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        .form-control {
+            background-color: #222;
+            border: 1px solid #444;
+            color: #fff;
+        }
+
+        .form-control:focus {
+            border-color: #f1c40f;
+        }
+
+        .btn-primary,
+        .btn-danger,
+        .btn-warning,
+        .btn-success {
+            font-weight: 600;
+            padding: 10px 15px;
+        }
+
+        .btn-primary:hover,
+        .btn-danger:hover,
+        .btn-warning:hover,
+        .btn-success:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-primary {
+            background-color: #f1c40f;
+            border: 2px solid #f1c40f;
+        }
+
+        .btn-primary:hover {
+            background-color: black;
+            color: #f1c40f;
+        }
+    </style>
 </head>
 <body>
 
@@ -79,7 +204,7 @@
 
     <script>
         function showEditForm(userId) {
-            const form = document.getElementById(`editForm-${userId}`);
+            const form = document.getElementById(editForm-${userId});
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
     </script>

@@ -91,7 +91,7 @@
             <% if (calificadas.length > 0) { %>
                 <% calificadas.forEach(movie => { %>
                     <div class="movie-item">
-                        <h4><%= movie.title %></h4>
+                        <h4><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></h4>
                         <p>Calificación: <strong><%= movie.rating %>/5</strong></p>
                         <p>Opinión: <%= movie.opinion %></p>
                     </div>
@@ -107,7 +107,7 @@
             <% if (favoritos.length > 0) { %>
                 <% favoritos.forEach(movie => { %>
                     <div class="movie-item">
-                        <h4><%= movie.title %></h4>
+                        <h4><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></h4>
                     </div>
                 <% }) %>
             <% } else { %>

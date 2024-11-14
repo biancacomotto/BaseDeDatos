@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Películas Favoritas de <%= username %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -15,7 +14,8 @@
         <ul class="list-group">
             <% favoritos.forEach(movie => { %>
                 <li class="list-group-item">
-                    <strong>Título:</strong> <%= movie.title %>
+                    <strong>Título:</strong>
+                    <a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a>
                 </li>
             <% }) %>
         </ul>
