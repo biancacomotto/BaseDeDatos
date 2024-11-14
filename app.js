@@ -198,51 +198,71 @@ app.get('/pelicula/:id', (req, res) => {
         languages: [],
       };
 
-      // Recorre cada fila para llenar los detalles
-      rows.forEach((row) => {
-        // Verificar y agregar directores
-        if (row.crew_member_id && row.crew_member_name && row.department_name === 'Directing' && row.job === 'Director') {
-          const directorExists = movieData.directors.some((director) => director.crew_member_id === row.crew_member_id);
-          if (!directorExists) {
+// Recorre cada fila de datos obtenidos de la consulta para llenar los detalles de la película
+rows.forEach((row) => {
+
+    // Verificar si la fila corresponde a un director
+    // Comprueba que la fila tenga un ID de miembro de equipo, nombre, y que el departamento sea 'Directing' y el trabajo sea 'Director'
+    if (row.crew_member_id && row.crew_member_name && row.department_name === 'Directing' && row.job === 'Director') {
+
+        // verificar si este director ya ha sido añadido a la lista de directores en movieData
+        const directorExists = movieData.directors.some((director) => director.crew_member_id === row.crew_member_id);
+
+        // si el director no existe en la lista (para evitar duplicados), lo agrega
+        if (!directorExists) {
             movieData.directors.push({
-              crew_member_id: row.crew_member_id,
-              crew_member_name: row.crew_member_name,
-              department_name: row.department_name,
-              job: row.job,
+                crew_member_id: row.crew_member_id,       // ID director
+                crew_member_name: row.crew_member_name,   // Nombre director
+                department_name: row.department_name,     // Departamento
+                job: row.job                              // Trabajo -> (Director)
             });
-          }
         }
+    }
+});
 
         // Verificar y agregar actores (reparto)
         if (row.actor_id && row.actor_name && row.character_name) {
-          const actorExists = movieData.cast.some((actor) => actor.actor_id === row.actor_id);
-          if (!actorExists) {
-            movieData.cast.push({
-              actor_id: row.actor_id,
-              actor_name: row.actor_name,
-              character_name: row.character_name,
-              cast_order: row.cast_order,
-            });
-          }
+
+            // Comprobar si el actor ya ha sido añadido a la lista de reparto en movieData
+            // La condición verifica que el actor no esté ya presente en la lista usando su ID
+            const actorExists = movieData.cast.some((actor) => actor.actor_id === row.actor_id);
+
+            // Si el actor no existe en la lista (para evitar duplicados), lo agrega a movieData.cast
+            if (!actorExists) {
+                movieData.cast.push({
+                    actor_id: row.actor_id,             // ID actor
+                    actor_name: row.actor_name,         // Nombre actor
+                    character_name: row.character_name, // Nombre del personaje interpretado por el actor
+                    cast_order: row.cast_order          // Orden del actor en los créditos
+                });
+            }
         }
 
-        // Agregar géneros únicos
-        if (row.genre_name && !movieData.genres.includes(row.genre_name)) {
-          movieData.genres.push(row.genre_name);
-        }
 
-        // Agregar empresas de producción sin duplicados
-        if (row.company_name && row.country_name) {
-          const companyExists = movieData.companies.some(
-            (company) => company.company_name === row.company_name && company.country_name === row.country_name
-          );
-          if (!companyExists) {
-            movieData.companies.push({
-              company_name: row.company_name,
-              country_name: row.country_name,
-            });
-          }
-        }
+// Agregar géneros únicos
+// Verifica si hay un género en la fila actual y si no está ya en la lista de géneros de la película
+if (row.genre_name && !movieData.genres.includes(row.genre_name)) {
+    // Si el género aún no está en la lista, se agrega a movieData.genres
+    movieData.genres.push(row.genre_name);
+}
+
+
+// Comprueba si hay información de la empresa en la fila actual (nombre y país)
+if (row.company_name && row.country_name) {
+    // Verifica si la empresa de producción ya se agrego a la lista de empresas
+    // Compara el nombre de la empresa y el país para evitar duplicados
+    const companyExists = movieData.companies.some(
+        (company) => company.company_name === row.company_name && company.country_name === row.country_name
+    );
+
+    // Si la empresa no existe en la lista, se agrega a movieData.companies
+    if (!companyExists) {
+        movieData.companies.push({
+            company_name: row.company_name,   // Nombre empresa de produccion
+            country_name: row.country_name    // Paisorigen empresa
+        });
+    }
+}
 
         // Agregar palabras clave sin duplicados
         if (row.keyword_name && !movieData.keywords.includes(row.keyword_name)) {
@@ -264,18 +284,18 @@ app.get('/pelicula/:id', (req, res) => {
 // Ruta para los datos de un actor específico
 app.get('/actor/:id', (req, res) => {
   const personId = req.params.id;
-
+ // Se crea un objeto actorData para almacenar los datos del actor y sus películas
   const actorData = {
     actorName: '',
     moviesActed: [],
   };
-
+// Consulta SQL para obtener el nombre del actor con el ID especificado
   const actorQuery = `
         SELECT person_name
         FROM person
         WHERE person_id = ?;
     `;
-
+  // Consulta SQL para obtener todas las películas en las que ha actuado el actor
   const actedQuery = `
         SELECT m.*
         FROM movie_cast mc
@@ -283,15 +303,17 @@ app.get('/actor/:id', (req, res) => {
         WHERE mc.person_id = ?;
     `;
 
+// Ejecuta consulta para obtener las peliculas actuadas por el actor
   db.all(actedQuery, [personId], (err, actedRows) => {
     if (!err) {
       actorData.moviesActed = actedRows;
 
+// Ejecuta segunda consulta para el nombre del actor
       db.get(actorQuery, [personId], (err, actorRow) => {
         if (!err && actorRow) {
           actorData.actorName = actorRow.person_name;
         }
-
+        // Muestra la vista 'actor' y le pasa los datos recopilados en actorData
         res.render('actor', actorData);
       });
     } else {
@@ -305,11 +327,13 @@ app.get('/actor/:id', (req, res) => {
 app.get('/director/:id', (req, res) => {
     const personId = req.params.id;
 
+// Estructura de datos para almacenar el nombre del director y las películas que dirigió
     const directorData = {
         directorName: '',
         moviesDirected: []
     };
 
+// Consulta SQL para obtener el nombre del director desde la tabla person
     const directorQuery = `
         SELECT person_name
         FROM person
@@ -335,7 +359,7 @@ app.get('/director/:id', (req, res) => {
                     directorData.directorName = directorRow.person_name; // Asignar el nombre del director
                 }
 
-                // Renderizar la página del director y pasar los datos
+                // Muestra la página del director y pasa los datos
                 res.render('director', directorData);
             });
         } else {
@@ -354,6 +378,7 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
     const { user_username, user_name, user_email, user_password } = req.body;
 
+// Encripta la contraseña del usuario antes de guardarla en la base de datos
     bcrypt.hash(user_password, 10, (err, hashedPassword) => {
         if (err) {
             console.error("Error al registrar el usuario:", err.message);
@@ -361,11 +386,13 @@ app.post('/register', (req, res) => {
             return;
         }
 
+// Consulta SQL para insertar un nuevo usuario en la tabla 'users'
         const query = `
             INSERT INTO users (user_username, user_name, user_email, user_password, role)
             VALUES (?, ?, ?, ?, 'user');
         `;
 
+ // Ejecuta la consulta SQL para insertar el nuevo usuario en la base de datos
         db.run(query, [user_username, user_name, user_email, hashedPassword], (err) => {
             if (err) {
                 console.error("Error al registrar el usuario:", err.message);
