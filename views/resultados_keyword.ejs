@@ -1,24 +1,122 @@
-  f<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Resultados de Búsqueda</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1c1c1c;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #ffdd57;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 2em;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        ul li {
+            margin: 10px 0;
+        }
+
+        .item-box {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.3s, background-color 0.3s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .item-box:hover {
+            transform: scale(1.03);
+            background-color: #3d3d3d;
+        }
+
+        a {
+            color: #ffdd57;
+            font-size: 1.2em;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #ffe784;
+        }
+
+        p {
+            color: #ccc;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        #inicio {
+            margin-top: 20px;
+        }
+
+        #inicio a {
+            background-color: #ffdd57;
+            color: #1c1c1c;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #inicio a:hover {
+            background-color: #e6c44d;
+            color: #000;
+        }
+
+        .back-link {
+            color: #ffdd57;
+            text-decoration: none;
+            font-size: 1em;
+            margin-top: 10px;
+            display: block;
+            text-align: center;
+        }
+
+        .back-link:hover {
+            color: #ffe784;
+        }
+    </style>
 </head>
 <body>
-    <h1>Resultados de Búsqueda para: <%= resultados.searchTerm %></h1>
-    <% if (resultados.movies.length > 0) { %>
-        <ul>
-            <% resultados.movies.forEach(movie => { %>
-                <li>
-                    <a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a>
-                </li>
-            <% }) %>
-        </ul>
-    <% } else { %>
-        <p>No se encontraron películas para esta palabra clave.</p>
-    <% } %>
-    <a href="/buscar?tipoBusqueda=keyword">Volver a buscar</a>
-    <div id="inicio"><a href="/">Inicio</a></div>
+<h1>Resultados de Búsqueda para: <%= resultados.searchTerm %></h1>
+
+<% if (resultados.movies.length > 0) { %>
+    <ul>
+        <% resultados.movies.forEach(movie => { %>
+            <li class="item-box">
+                <a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a>
+            </li>
+        <% }) %>
+    </ul>
+<% } else { %>
+    <p>No se encontraron películas para esta palabra clave.</p>
+<% } %>
+
+<a href="/buscar?tipoBusqueda=keyword" class="back-link">Volver a buscar</a>
+
+<div id="inicio"><a href="/">Inicio</a></div>
 </body>
 </html>

@@ -4,9 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Películas del Usuario</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1c1c1c;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffdd57;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+
+        th {
+            background-color: #333;
+            color: #ffdd57;
+            font-weight: 600;
+        }
+
+        td {
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #444;
+            transform: scale(1.03);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        a {
+            color: #ffdd57;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #ffdd57;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            margin-top: 30px;
+            display: inline-block;
+        }
+
+        a:hover {
+            background-color: #ffdd57;
+            color: #333;
+        }
+
+        .no-movies {
+            font-size: 1.2rem;
+            color: #ffdd57;
+        }
+    </style>
 </head>
 <body>
+
 <h1>Películas del Usuario</h1>
+
 <table>
     <thead>
     <tr>
@@ -26,11 +97,13 @@
         <% }) %>
     <% } else { %>
         <tr>
-            <td colspan="3">No hay películas en la lista.</td>
+            <td colspan="3" class="no-movies">No hay películas en la lista.</td>
         </tr>
     <% } %>
     </tbody>
 </table>
+
 <a href="/">Volver a la página principal</a>
+
 </body>
 </html>

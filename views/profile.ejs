@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>Perfil de <%= username %></title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(120deg, #0093E9 0%, #80D0C7 100%);
-            color: #333;
+            font-family: 'Poppins', sans-serif;
+            background: #1c1c1c;
+            color: #fff;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -16,19 +18,28 @@
             min-height: 100vh;
         }
 
-        h1, h2 {
-            color: #333;
+        h1 {
+            color: #ffdd57;
             margin-bottom: 15px;
             text-align: center;
+            font-weight: 600;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s; /* Agrega transición de transform */
+        }
+
+        /* Efecto hover en el título */
+        h1:hover {
+            color: #ffe784;
+            text-shadow: 2px 2px 8px rgba(255, 221, 87, 0.6);
+            transform: scale(1.1); /* Agranda el texto al pasar el mouse */
         }
 
         .container {
             width: 100%;
             max-width: 800px;
-            background-color: #fff;
+            background-color: #2b2b2b;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .section {
@@ -36,22 +47,35 @@
         }
 
         .section h3 {
-            color: #007bff;
+            color: #ffdd57;
             font-size: 1.4em;
             margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .movie-item {
-            border: 1px solid #ddd;
+            border: 1px solid #444;
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 10px;
-            background-color: #f9f9f9;
+            background-color: #333;
+            color: #eee;
+            transition: transform 0.2s, background-color 0.3s;
         }
 
-        .movie-item h4 {
-            margin: 0;
-            color: #333;
+        .movie-item:hover {
+            transform: scale(1.02);
+            background-color: #3d3d3d;
+        }
+
+        .movie-item h4 a {
+            color: #ffdd57;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .movie-item h4 a:hover {
+            color: #ffe784;
         }
 
         .movie-item p {
@@ -61,62 +85,66 @@
 
         .button {
             display: inline-block;
-            background-color: #007bff;
-            color: #fff;
+            background-color: #ffdd57;
+            color: #1c1c1c;
             padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
             font-size: 16px;
+            font-weight: 600;
             margin-top: 20px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .button:hover {
-            background-color: #0056b3;
+            background-color: #e6c44d;
+            color: #000;
         }
 
         .no-movies {
             font-size: 1em;
-            color: #555;
+            color: #ccc;
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Bienvenido, <%= username %></h1>
+<h1>Bienvenido, <%= username %></h1>
 
-    <div class="container">
-        <!-- Sección de Películas Calificadas -->
-        <div class="section">
-            <h3>Películas Calificadas</h3>
-            <% if (calificadas.length > 0) { %>
-                <% calificadas.forEach(movie => { %>
-                    <div class="movie-item">
-                        <h4><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></h4>
-                        <p>Calificación: <strong><%= movie.rating %>/5</strong></p>
-                        <p>Opinión: <%= movie.opinion %></p>
-                    </div>
-                <% }) %>
-            <% } else { %>
-                <p class="no-movies">No has calificado ninguna película.</p>
-            <% } %>
-        </div>
-
-        <!-- Sección de Películas Favoritas -->
-        <div class="section">
-            <h3>Películas Favoritas</h3>
-            <% if (favoritos.length > 0) { %>
-                <% favoritos.forEach(movie => { %>
-                    <div class="movie-item">
-                        <h4><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></h4>
-                    </div>
-                <% }) %>
-            <% } else { %>
-                <p class="no-movies">No has agregado ninguna película a tus favoritos.</p>
-            <% } %>
-        </div>
+<div class="container">
+    <!-- Sección de Películas Calificadas -->
+    <div class="section">
+        <h3>Películas Calificadas</h3>
+        <% if (calificadas.length > 0) { %>
+            <% calificadas.forEach(movie => { %>
+                <div class="movie-item">
+                    <h4><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></h4>
+                    <p>Calificación: <strong><%= movie.rating %>/5</strong></p>
+                    <p>Opinión: <%= movie.opinion %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="no-movies">No has calificado ninguna película.</p>
+        <% } %>
     </div>
 
-    <!-- Botón para volver al inicio -->
-    <a href="/" class="button">Volver al inicio</a>
+    <!-- Sección de Películas Favoritas -->
+    <div class="section">
+        <h3>Películas Favoritas</h3>
+        <% if (favoritos.length > 0) { %>
+            <% favoritos.forEach(movie => { %>
+                <div class="movie-item">
+                    <h4><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %></a></h4>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="no-movies">No has agregado ninguna película a tus favoritos.</p>
+        <% } %>
+    </div>
+</div>
+
+<!-- Botón para volver al inicio -->
+<a href="/" class="button">Volver al inicio</a>
 </body>
 </html>
