@@ -1,23 +1,24 @@
 // Importación de módulos y configuración inicial
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const session = require('express-session');
-const ejs = require('ejs');
-const bodyParser = require('body-parser');
-const methodOverride = require('method-override');
-const bcrypt = require('bcrypt');
-const { LocalStorage } = require('node-localstorage');
+const express = require('express'); //importo express.js, framework para crear aplicaciones web y manejar rutas HTTP
+const sqlite3 = require('sqlite3').verbose(); // SQLite es una base de datos ligera, y verbose nos da más detalles al depurar
+const session = require('express-session'); // Usamos express-session para manejar las sesiones de los usuarios
+const ejs = require('ejs'); // ejs es el motor de plantillas que usamos para generar HTML dinámico
+const bodyParser = require('body-parser'); // body-parser nos ayuda a leer los datos que vienen en las solicitudes HTTP
+const methodOverride = require('method-override'); // Con method-override podemos usar metodos como PUT y DELETE en formularios HTML
+const bcrypt = require('bcrypt'); // bcrypt es una libreria para encriptar contraseñas de manera segura
+const { LocalStorage } = require('node-localstorage'); // LocalStorage nos permite guardar datos de manera persistente en el servidor
 
+// Creamos una instancia de LocalStorage para guardar datos en el directorio './scratch'
 const localStorage = new LocalStorage('./scratch');
-const app = express();
-const port = process.env.PORT || 3000;
+const app = express(); // Inicializamos la aplicacion Express
+const port = process.env.PORT || 3000; // Definimos el puerto donde se ejecutara la aplicación, si no está definido usamos el puerto 3000
 
-// Configuración de middlewares y archivos estáticos
-app.use(express.static('views'));
-app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(methodOverride('_method'));
+// Configuración de middlewares y archivos estaticos
+app.use(express.static('views')); // Sirve archivos estaticos desde la carpeta 'views'
+app.use(express.static('public')); // Sirve archivos estaticos desde la carpeta 'public'
+app.use(bodyParser.urlencoded({ extended: true })); // Permite procesar datos de formularios (POST) con codificacion URL
+app.use(bodyParser.json()); // Permite procesar solicitudes con datos en formato JSON
+app.use(methodOverride('_method')); // Permite usar metodos HTTP adicionales como PUT y DELETE en formularios HTML
 
 // Configuración del motor de plantillas EJS
 app.set('view engine', 'ejs');
@@ -25,8 +26,8 @@ app.set('view engine', 'ejs');
 // Configuración de la sesión
 app.use(
   session({
-    secret: 'tu_secreto', // Cambia esto a un valor único y secreto
-    resave: false,
+    secret: 'tu_secreto', // Cambia esto a un valor unico y secreto
+    resave: false, // Si se debe volver a guardar la sesion aunq no haya sido modificada. 'false' evita que se guarde innecesariamente.
     saveUninitialized: true,
     cookie: { secure: false }, // Cambia a true si usas HTTPS
   })
@@ -35,60 +36,32 @@ app.use(
 // Configuración de la base de datos
 const db = new sqlite3.Database('./movies.db');
 
-// Crear la tabla favoritos si no existe
-db.run(
-  `
-    CREATE TABLE IF NOT EXISTS favoritos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        movie_id INTEGER NOT NULL,
-        rating INTEGER CHECK(rating BETWEEN 1 AND 5),
-        opinion TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(user_id),
-        FOREIGN KEY (movie_id) REFERENCES movie(movie_id)
-    )
-  `,
-  (err) => {
-    if (err) {
-      console.error('Error al crear la tabla favoritos:', err.message);
-    } else {
-      console.log('Tabla favoritos creada o ya existe.');
-
-      // Crear índice para user_id en favoritos
-      db.run(`CREATE INDEX IF NOT EXISTS idx_favoritos_user_id ON favoritos(user_id)`, (err) => {
-        if (err) {
-          console.error('Error al crear el índice idx_favoritos_user_id:', err.message);
-        } else {
-          console.log('Índice idx_favoritos_user_id creado o ya existe.');
-        }
-      });
-    }
-  }
-);
-
-// ------------------------------------------------------
-
 // Ruta para buscar películas, directores y actores
 app.get('/buscar', (req, res) => {
   const searchTerm = req.query.q;
   const tipoBusqueda = req.query.tipoBusqueda;
 
+    // Creamos un objeto para almacenar los resultados de la busqueda
   const resultados = {
-    searchTerm,
-    movies: [],
-    actors: [],
-    directors: [],
-    keywords: [],
+    searchTerm, // El termino de búsqueda que el usuario proporcionó
+    movies: [], // Array vacio para almacenar los resultados de las películas
+    actors: [], // Array vacio para almacenar los resultados de los actores
+    directors: [], // Array vacio para almacenar los resultados de los directores
+    keywords: [], // Array vacio para almacenar los resultados de palabras clave
   };
 
+// Si el tipo de búsqueda es 'movie', buscamos películas por título
   if (tipoBusqueda === 'movie') {
+      // Creamos la consulta SQL para obtener las películas cuyo título contenga el término de búsqueda
     const consultaMovies = `SELECT DISTINCT * FROM movie WHERE title LIKE ? ORDER BY title ASC;`;
     db.all(consultaMovies, [`%${searchTerm}%`], (err, movieRows) => {
       if (!err) {
         resultados.movies = movieRows;
       }
+        // Renderizamos la vista 'resultado' y pasamos los resultados y el tipo de búsqueda
       res.render('resultado', { resultados, tipoBusqueda });
     });
+      // Si el tipo de búsqueda es 'actor', buscamos actores por nombre
   } else if (tipoBusqueda === 'actor') {
     const consultaActores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_cast mc ON p.person_id = mc.person_id WHERE person_name LIKE ? ORDER BY person_name ASC;`;
     db.all(consultaActores, [`%${searchTerm}%`], (err, actorRows) => {
@@ -97,6 +70,7 @@ app.get('/buscar', (req, res) => {
       }
       res.render('resultado', { resultados, tipoBusqueda });
     });
+      // Si el tipo de búsqueda es 'director', buscamos directores por nombre
   } else if (tipoBusqueda === 'director') {
     const consultaDirectores = `SELECT DISTINCT person_name, p.person_id FROM person p JOIN movie_crew mc ON p.person_id = mc.person_id WHERE person_name LIKE ? AND mc.job = 'Director' ORDER BY person_name ASC;`;
     db.all(consultaDirectores, [`%${searchTerm}%`], (err, directorRows) => {
@@ -105,7 +79,10 @@ app.get('/buscar', (req, res) => {
       }
       res.render('resultado', { resultados, tipoBusqueda });
     });
+
+    // Si el tipo de búsqueda es 'keyword', buscamos películas por palabras clave
   } else if (tipoBusqueda === 'keyword') {
+      // Creamos la consulta SQL para obtener películas asociadas a la keyword que contenga el término de búsqueda
     const consultaKeywords = `
              SELECT DISTINCT *
              FROM movie
@@ -114,19 +91,23 @@ app.get('/buscar', (req, res) => {
              WHERE keyword_name LIKE ?
              ORDER BY title ASC;
         `;
+      // Ejecutamos la consulta en la base de datos
     db.all(consultaKeywords, [`%${searchTerm}%`], (err, movieRows) => {
       if (!err) {
         resultados.movies = movieRows;
       }
+        // Renderizamos la vista 'resultados_keyword' y pasamos los resultados
       res.render('resultados_keyword', { resultados });
     });
   }
 });
 
-// Ruta para la página de datos de una película particular
+
 // Ruta para la página de datos de una película particular
 app.get('/pelicula/:id', (req, res) => {
+    // Obtenemos el id de la película desde la URL
   const movieId = req.params.id;
+
   const successMessage = req.session.success; // Obtener el mensaje de éxito de la sesión
   req.session.success = null; // Limpiar el mensaje después de obtenerlo
 
@@ -135,6 +116,7 @@ app.get('/pelicula/:id', (req, res) => {
     return res.redirect('/');
   }
 
+// Consulta SQL para obtener todos los detalles relevantes de la película, incluyendo actores, directores, géneros, compañías de producción, etc
   const query = `
         SELECT DISTINCT
             movie.movie_id, -- Asegúrate de incluir movie_id aquí
@@ -174,7 +156,7 @@ app.get('/pelicula/:id', (req, res) => {
             LEFT JOIN language ON movie_languages.language_id = language.language_id
         WHERE movie.movie_id = ?
     `;
-
+// Ejecutamos la consulta en la base de datos usando el movieId
   db.all(query, [movieId], (err, rows) => {
     if (err) {
       console.error(err);
@@ -182,8 +164,10 @@ app.get('/pelicula/:id', (req, res) => {
     } else if (rows.length === 0) {
       res.status(404).send('Película no encontrada.');
     } else {
-      // Inicializar movieData con todos los campos importantes
-      const movieData = {
+        // Si se encuentran datos, los organizamos y preparamos para pasarlos a la vista
+
+        // Inicializamos un objeto `movieData` con los detalles básicos de la película
+        const movieData = {
         id: movieId,
         title: rows[0].title,
         release_date: rows[0].release_date,
@@ -643,14 +627,15 @@ app.get('/usuario/:id/peliculas-calificadas', (req, res) => {
 
 // Ruta para ver las películas favoritas de un usuario
 app.get('/usuario/:id/peliculas-favoritas', (req, res) => {
-    const userId = req.params.id;
-    const userQuery = `SELECT user_name FROM users WHERE user_id = ?`;
+    const userId = req.params.id; //obtengo el id del usuario
+    const userQuery = `SELECT user_name FROM users WHERE user_id = ?`; // Consulta SQL para obtener el nombre del usuario a partir del user_id
     db.get(userQuery, [userId], (err, user) => {
         if (err || !user) {
             console.error(err || "Usuario no encontrado");
             return res.status(404).send("Usuario no encontrado.");
         }
 
+        // Consulta SQL para obtener las películas favoritas del usuario
         const favoritosQuery = `
             SELECT movie.movie_id, movie.title
             FROM favoritos
@@ -658,12 +643,14 @@ app.get('/usuario/:id/peliculas-favoritas', (req, res) => {
             WHERE favoritos.user_id = ?;
         `;
 
+        // Ejecutamos la consulta para obtener las películas favoritas del usuario
         db.all(favoritosQuery, [userId], (err, favoritos) => {
             if (err) {
                 console.error("Error al obtener las películas favoritas:", err);
                 return res.status(500).send("Error al obtener las películas favoritas.");
             }
 
+            // Renderizamos la vista 'peliculas-favoritas' y le pasamos el nombre del usuario y las películas favoritas
             res.render('peliculas-favoritas', {
                 username: user.user_name,
                 favoritos
@@ -678,21 +665,27 @@ app.get('/usuario/:id/peliculas-favoritas', (req, res) => {
 // Ruta para mostrar la página principal
 app.get('/', (req, res) => {
     const isLoggedIn = !!req.session.user; // Verifica si el usuario está logeado
+    // Si el usuario está logeado, se obtiene su nombre de usuario, sino se muestra como 'Visitante'
     const username = isLoggedIn ? req.session.user.user_name : 'Visitante';
 
+    // Renderiza la vista 'index' y pasa los datos de si el usuario está logeado y su nombre de usuario
     res.render('index', {
-        isLoggedIn,
-        username
+        isLoggedIn,   // Determina si el usuario está logeado
+        username      // El nombre del usuario o 'Visitante'
     });
 });
 
 // Ruta para el perfil del usuario logeado
 app.get('/profile', (req, res) => {
+    // Si no hay un usuario logeado en la sesión, redirige al login
     if (!req.session.user) {
         return res.redirect('/login');
     }
 
+    // Obtiene el ID del usuario desde la sesión
     const userId = req.session.user.user_id;
+
+    // Consulta SQL para obtener las películas favoritas del usuario y sus valoraciones y opiniones
     const query = `
         SELECT movie.title, favoritos.rating, favoritos.opinion
         FROM favoritos
@@ -700,28 +693,35 @@ app.get('/profile', (req, res) => {
         WHERE favoritos.user_id = ?;
     `;
 
+    // Ejecuta la consulta para obtener las películas favoritas del usuario
     db.all(query, [userId], (err, movies) => {
         if (err) {
             console.error('Error al obtener las películas favoritas:', err);
             return res.status(500).send('Error al obtener las películas favoritas.');
         }
 
+        // Si la consulta es exitosa, renderiza la vista 'profile' con el nombre de usuario y las películas favoritas
         res.render('profile', { username: req.session.user.user_name, movies });
     });
 });
 
 // Ruta para editar un usuario
 app.post('/users/:userId/edit', (req, res) => {
+    // Obtiene el ID del usuario desde los parámetros de la URL
     const userId = req.params.userId;
+    // Obtiene los datos enviados en el cuerpo de la solicitud (nombre de usuario, nombre real, y correo electrónico)
     const { user_username, user_name, user_email } = req.body;
 
     // Verificar si el usuario logueado es administrador
     if (req.session.user && req.session.user.role === 'admin') {
+        // Consulta SQL para actualizar la información del usuario en la base de datos
         const updateQuery = `
             UPDATE users
             SET user_username = ?, user_name = ?, user_email = ?
             WHERE user_id = ?;
         `;
+
+        // Ejecutar la consulta para actualizar los datos del usuario
         db.run(updateQuery, [user_username, user_name, user_email, userId], (err) => {
             if (err) {
                 console.error('Error al actualizar usuario:', err);
@@ -730,7 +730,7 @@ app.post('/users/:userId/edit', (req, res) => {
             res.redirect('/users');
         });
     } else {
-        res.status(403).send('Acceso denegado: solo el administrador puede modificar usuarios.');
+        res.status(403).send('Acceso denegado: solo el administrador puede modificar usuarios.'); // Si el usuario logueado no es administrador, se deniega el acceso
     }
 });
 
@@ -741,6 +741,7 @@ app.post('/users/:userId/delete', (req, res) => {
     // Verificar si el usuario logueado es administrador
     if (req.session.user && req.session.user.role === 'admin') {
         const deleteQuery = `DELETE FROM users WHERE user_id = ?;`;
+        // Ejecutar la consulta para eliminar al usuario
         db.run(deleteQuery, [userId], (err) => {
             if (err) {
                 console.error('Error al eliminar usuario:', err);
@@ -749,12 +750,12 @@ app.post('/users/:userId/delete', (req, res) => {
             res.redirect('/users');
         });
     } else {
-        res.status(403).send('Acceso denegado: solo el administrador puede eliminar usuarios.');
+        res.status(403).send('Acceso denegado: solo el administrador puede eliminar usuarios.'); // Si el usuario logueado no es administrador, se deniega el acceso
     }
 });
 
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor en ejecución en http://localhost:${port}`);
+  console.log(`Servidor en ejecución en http://localhost:${port}`); // Muestra en la consola que el servidor está corriendo
 });
